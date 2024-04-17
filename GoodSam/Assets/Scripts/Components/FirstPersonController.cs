@@ -8,6 +8,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using Unity.VisualScripting;
+
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -16,7 +20,8 @@ using System.Net;
 
 public class FirstPersonController : MonoBehaviour
 {
-    private Rigidbody rb;
+    private Rigidbody _rigidbody;
+    private PlayerInput _playerInput;
 
     #region Camera Movement Variables
 
@@ -38,6 +43,8 @@ public class FirstPersonController : MonoBehaviour
     private float yaw = 0.0f;
     private float pitch = 0.0f;
     private Image crosshairObject;
+
+    private Vector2 _lookDirection;
 
     #region Camera Zoom Variables
 
@@ -61,6 +68,7 @@ public class FirstPersonController : MonoBehaviour
 
     // Internal Variables
     private bool isWalking = false;
+    private Vector2 _moveDirection;
 
     #region Sprint
 
@@ -100,7 +108,7 @@ public class FirstPersonController : MonoBehaviour
 
     // Internal Variables
     private bool isGrounded = false;
-
+    private bool _jumped = false;
     #endregion
 
     #region Crouch
@@ -133,7 +141,8 @@ public class FirstPersonController : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        _playerInput = new PlayerInput();
+        _rigidbody = GetComponent<Rigidbody>();
 
         crosshairObject = GetComponentInChildren<Image>();
 
@@ -147,9 +156,24 @@ public class FirstPersonController : MonoBehaviour
             sprintRemaining = sprintDuration;
             sprintCooldownReset = sprintCooldown;
         }
+
+        _playerInput.Player.Jump.performed += OnJump;
+        _playerInput.Player.Jump.canceled += OnJump;
     }
 
-    void Start()
+    private void OnEnable()
+    {
+        _playerInput.Enable();
+    }
+    private void OnDisable()
+    {
+        _playerInput.Disable();
+    }
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        _jumped = context.ReadValue<float>() > 0f ? true : false;
+    }
+    private void Start()
     {
         if (lockCursor)
         {
@@ -204,20 +228,15 @@ public class FirstPersonController : MonoBehaviour
     {
         #region Camera
 
+
+
         // Control camera movement
         if (cameraCanMove)
         {
-            yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
+            _lookDirection = _playerInput.Player.Look.ReadValue<Vector2>();
 
-            if (!invertCamera)
-            {
-                pitch -= mouseSensitivity * Input.GetAxis("Mouse Y");
-            }
-            else
-            {
-                // Inverted Y
-                pitch += mouseSensitivity * Input.GetAxis("Mouse Y");
-            }
+            yaw = transform.localEulerAngles.y + _lookDirection.x * mouseSensitivity;
+            pitch -= mouseSensitivity * _lookDirection.y;
 
             // Clamp pitch between lookAngle
             pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
@@ -232,7 +251,7 @@ public class FirstPersonController : MonoBehaviour
         {
             // Changes isZoomed when key is pressed
             // Behavior for toogle zoom
-            if (Input.GetKeyDown(zoomKey) && !holdToZoom && !isSprinting)
+            if (_playerInput.Player.Zoom.phase == InputActionPhase.Performed && !holdToZoom && !isSprinting)
             {
                 if (!isZoomed)
                 {
@@ -248,11 +267,11 @@ public class FirstPersonController : MonoBehaviour
             // Behavior for hold to zoom
             if (holdToZoom && !isSprinting)
             {
-                if (Input.GetKeyDown(zoomKey))
+                if (_playerInput.Player.Zoom.phase == InputActionPhase.Performed)
                 {
                     isZoomed = true;
                 }
-                else if (Input.GetKeyUp(zoomKey))
+                else if (_playerInput.Player.Zoom.phase == InputActionPhase.Waiting)
                 {
                     isZoomed = false;
                 }
@@ -326,8 +345,9 @@ public class FirstPersonController : MonoBehaviour
         #region Jump
 
         // Gets input and calls jump method
-        if (enableJump && Input.GetKeyDown(jumpKey) && isGrounded)
+        if (enableJump && _jumped && isGrounded)
         {
+            _jumped = false;
             Jump();
         }
 
@@ -370,8 +390,9 @@ public class FirstPersonController : MonoBehaviour
 
         if (playerCanMove)
         {
+            _moveDirection = _playerInput.Player.Move.ReadValue<Vector2>();
             // Calculate how fast we should be moving
-            Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            Vector3 targetVelocity = new Vector3(_moveDirection.x, 0, _moveDirection.y);
 
             // Checks if player is walking and isGrounded
             // Will allow head bob
@@ -385,12 +406,12 @@ public class FirstPersonController : MonoBehaviour
             }
 
             // All movement calculations shile sprint is active
-            if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
+            if (enableSprint && _playerInput.Player.Sprint.phase == InputActionPhase.Performed && sprintRemaining > 0f && !isSprintCooldown)
             {
                 targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
 
                 // Apply a force that attempts to reach our target velocity
-                Vector3 velocity = rb.velocity;
+                Vector3 velocity = _rigidbody.velocity;
                 Vector3 velocityChange = (targetVelocity - velocity);
                 velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
@@ -413,7 +434,7 @@ public class FirstPersonController : MonoBehaviour
                     }
                 }
 
-                rb.AddForce(velocityChange, ForceMode.VelocityChange);
+                _rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
             }
             // All movement calculations while walking
             else
@@ -428,13 +449,13 @@ public class FirstPersonController : MonoBehaviour
                 targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
 
                 // Apply a force that attempts to reach our target velocity
-                Vector3 velocity = rb.velocity;
+                Vector3 velocity = _rigidbody.velocity;
                 Vector3 velocityChange = (targetVelocity - velocity);
                 velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
                 velocityChange.y = 0;
 
-                rb.AddForce(velocityChange, ForceMode.VelocityChange);
+                _rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
             }
         }
 
@@ -464,7 +485,7 @@ public class FirstPersonController : MonoBehaviour
         // Adds force to the player rigidbody to jump
         if (isGrounded)
         {
-            rb.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
+            _rigidbody.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
             isGrounded = false;
         }
 
