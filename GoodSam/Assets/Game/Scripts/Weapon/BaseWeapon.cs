@@ -1,15 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.TextCore.Text;
 
 public abstract class BaseWeapon : MonoBehaviour
 {
     public UnityAction<BaseWeapon> OnClipEmpty;
 
     [Header("Weapon")]
+    protected CrosshairTarget _crosshairTarget;
     [SerializeField] protected Transform MuzzleSocket;
     [SerializeField] protected WeaponData WeaponData;
     [SerializeField] protected AmmoData DefaultAmmo;
@@ -18,8 +15,8 @@ public abstract class BaseWeapon : MonoBehaviour
     [Header("UI")]
     [SerializeField] protected WeaponUIData UIData;
 
-    // [Header("VFX")]
-    //TODO: vfx
+    [Header("Animation")]
+    public AnimationClip WeaponAnimation;
 
 
 
@@ -30,20 +27,21 @@ public abstract class BaseWeapon : MonoBehaviour
         enabled = false;
 
     }
-    public void Init()
+    public void Init(CrosshairTarget crosshairTarget)
     {
         if (DefaultAmmo.Bullets <= 0)
             Debug.Log("BUllets count couldn`t be less of equal zero");
         if (DefaultAmmo.Clips <= 0)
             Debug.Log("Clips count couldn`t be less of equal zero");
 
+        _crosshairTarget = crosshairTarget;
         _currentAmmo = DefaultAmmo;
     }
-
-    public BaseWeapon GetClass()
+    public WeaponData GetData()
     {
-        return WeaponData.Weapon;
+        return WeaponData;
     }
+   
     public abstract void StartFire();
     public abstract void StopFire();
 
@@ -130,18 +128,15 @@ public abstract class BaseWeapon : MonoBehaviour
     }
     protected void GetPlayerViewPoint(ref Vector3 viewLocation, ref Quaternion viewRotation)
     {
-        viewLocation = Camera.main.transform.position;
-       // viewLocation = MuzzleSocket.transform.position;
+        viewLocation = MuzzleSocket.transform.position;
+        //viewLocation = Camera.main.transform.position;
         viewRotation = MuzzleSocket.transform.rotation;
 
     }
 
     protected void MakeHit(out RaycastHit hitResult, Vector3 traceStart, Vector3 direction)
     {
-
-        Debug.DrawRay(traceStart, direction, Color.red, 5, false);
         Physics.Raycast(traceStart, direction, out hitResult, TraceMaxDistance);
-        //????
     }
     protected void DecreaseAmmo()
     {

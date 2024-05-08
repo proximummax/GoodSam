@@ -3,11 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class AnimationComponent : MonoBehaviour
 {
-    private Animator _animator;
-    private readonly int RUN_STATE = Animator.StringToHash("Run");
+    private readonly int INPUT_X = Animator.StringToHash("InputX");
+    private readonly int INPUT_Y = Animator.StringToHash("InputY");
 
+    private Animator _animator;
+    private ThirdPlayerController _thirdPlayerController;
     private void Awake()
     {
+        _thirdPlayerController = GetComponent<ThirdPlayerController>();
         _animator = GetComponent<Animator>();
     }
     public void Enable()
@@ -18,8 +21,9 @@ public class AnimationComponent : MonoBehaviour
     {
         _animator.enabled = false;
     }
-    public void SetRunState(bool state)
+    private void Update()
     {
-        _animator.SetBool(RUN_STATE, state);
+        _animator.SetFloat(INPUT_X, _thirdPlayerController.Input.x);
+        _animator.SetFloat(INPUT_Y, _thirdPlayerController.Input.y);
     }
 }

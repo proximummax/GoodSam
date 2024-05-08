@@ -1,37 +1,53 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
 
 public class WeaponOwnerComponent : MonoBehaviour
 {
-    [SerializeField] private List<WeaponData> _weaponDatas;
+    [SerializeField] private CrosshairTarget _crosshairTarget;
+    [SerializeField] private List<BaseWeapon> _weaponDatas;
     [SerializeField] private Transform _weaponEquipSocket;
     [SerializeField] private Transform _armoryEquipSocket;
-    [SerializeField] private Animation _equipAnimation;
+    [Header("Animations")]
+    [SerializeField] private Transform _leftGrip;
+    [SerializeField] private Transform _rightGrip;
+    [SerializeField] private Rig _handIK;
 
-    private BaseWeapon _currentWeapon = null;
-    private List<BaseWeapon> _weapons = new List<BaseWeapon>();
-    private int _currentWeaponIndex = 0;
+    [SerializeField] private BaseWeapon _currentWeapon = null;
+
+    private Animator _animator;
+    private AnimatorOverrideController _overrides;
+    //   private List<BaseWeapon> _weapons = new List<BaseWeapon>();
+    //  private int _currentWeaponIndex = 0;
 
     private Animation _currentReloadAnim = null;
     private bool _equipAnimInProgress = false;
     private bool _reloadAnimInProgress = false;
 
+    private bool _firstEquip = true;
 
     private void Start()
     {
-        enabled = false;
+        _animator = GetComponent<Animator>();
+        _overrides = _animator.runtimeAnimatorController as AnimatorOverrideController;
+
+        _handIK.weight = 0.0f;
+        _animator.SetLayerWeight(1, 0.0f);
 
         InitAnimations();
-        _currentWeaponIndex = 0;
-        SpawnWeapons();
-        EquipWeapon(_currentWeaponIndex);
+        //    _currentWeaponIndex = 0;
+        //   SpawnWeapons();
+        EquipWeapon(_currentWeapon);
     }
     public void StartFire(InputAction.CallbackContext context)
     {
+        Debug.Log("call?");
         if (!CanFire()) return;
+        Debug.Log("can?");
         _currentWeapon.StartFire();
     }
     public void StopFire(InputAction.CallbackContext context)
@@ -44,8 +60,8 @@ public class WeaponOwnerComponent : MonoBehaviour
         if (!CanEquip())
             return;
 
-        _currentWeaponIndex = (_currentWeaponIndex + 1) % _weaponDatas.Count;
-        EquipWeapon(_currentWeaponIndex);
+        //      _currentWeaponIndex = (_currentWeaponIndex + 1) % _weaponDatas.Count;
+        //   EquipWeapon(_currentWeaponIndex);
     }
     public void Reload()
     {
@@ -71,28 +87,28 @@ public class WeaponOwnerComponent : MonoBehaviour
         return true;
     }
 
-    public bool TryToAddAmmo(BaseWeapon weaponType, int clipsAmount)
-    {
-        foreach (var weapon in _weapons)
+    /*    public bool TryToAddAmmo(BaseWeapon weaponType, int clipsAmount)
         {
-            if (!weapon || weapon.GetType() != weaponType.GetType())
-                continue;
+            foreach (var weapon in _weapons)
+            {
+                if (!weapon || weapon.GetType() != weaponType.GetType())
+                    continue;
 
-            return weapon.TryToAddAmmo(clipsAmount);
+                return weapon.TryToAddAmmo(clipsAmount);
+            }
+            return false;
         }
-        return false;
-    }
-    public bool NeedAmmo(BaseWeapon weaponType)
-    {
-        foreach (var weapon in _weapons)
+        public bool NeedAmmo(BaseWeapon weaponType)
         {
-            if (!weapon || weapon.GetType() != weaponType.GetType())//  !weapon->IsA(WeaponType))
-                continue;
+            foreach (var weapon in _weapons)
+            {
+                if (!weapon || weapon.GetType() != weaponType.GetType())//  !weapon->IsA(WeaponType))
+                    continue;
 
-            return weapon.IsAmmoFull();
-        }
-        return false;
-    }
+                return weapon.IsAmmoFull();
+            }
+            return false;
+        }*/
     protected bool CanFire()
     {
         return _currentWeapon && !_equipAnimInProgress && !_reloadAnimInProgress;
@@ -101,40 +117,54 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         return !_equipAnimInProgress && !_reloadAnimInProgress;
     }
-    protected void EquipWeapon(int weaponIndex)
+    public void EquipWeapon(BaseWeapon weapon)
     {
-        Debug.Log("lets equip");
-        if (weaponIndex < 0 || weaponIndex >= _weapons.Count) return;
-        Debug.Log("ok");
-        if (_currentWeapon)
+        //  if (weaponIndex < 0 || weaponIndex >= _weapons.Count) return;
+        if (weapon == null) return;
+
+        if (_currentWeapon && _firstEquip == false)
         {
             _currentWeapon.StopFire();
-            AttachWeaponToSocket(_currentWeapon, _armoryEquipSocket);
+            Destroy(_currentWeapon.gameObject);
+            //       AttachWeaponToSocket(_currentWeapon, _armoryEquipSocket);
         }
-        _currentWeapon = _weapons[weaponIndex];
-        Debug.Log(_currentWeapon.name);
-        var currentWeaponData = _weaponDatas.FirstOrDefault((x) => x.Weapon == _currentWeapon.GetClass());
+        _firstEquip = false;
+        _currentWeapon = weapon;
 
-        _currentReloadAnim = currentWeaponData ? currentWeaponData.ReloadAnim : null;
         AttachWeaponToSocket(_currentWeapon, _weaponEquipSocket);
-        //TODO WITH ANIM!
-        //_equipAnimInProgress = true;
-        PlayAnimMontage(_equipAnimation);
+        _currentWeapon.Init(_crosshairTarget);
+        _currentWeapon.OnClipEmpty += OnEmptyClip;
+
+        //    var currentWeaponData = _weaponDatas.FirstOrDefault((x) => x.GetData().Weapon == _currentWeapon.GetData().Weapon);
+
+        //    _currentReloadAnim = currentWeaponData ? currentWeaponData.GetData().ReloadAnim : null;
+
+        //  AttachWeaponToSocket(_currentWeapon, _weaponEquipSocket);
+
+        _handIK.weight = 1.0f;
+        _animator.SetLayerWeight(1, 1.0f);
+        Invoke(nameof(SetAnimationDelayed), 0.001f);
+       
     }
 
+    private void SetAnimationDelayed()
+    {
+        _overrides["weapon_anim_empty"] = _currentWeapon.WeaponAnimation;
+    }
     private void SpawnWeapons()
     {
-        foreach (var weaponData in _weaponDatas)
+        foreach (var weapon in _weaponDatas)
         {
-            var weapon = Instantiate(weaponData.Weapon, transform);
+            //var weapon = Instantiate(weaponData.Weapon, transform);
             if (!weapon) continue;
-            weapon.Init();
-            weapon.OnClipEmpty += OnEmptyClip;
+
+            //     weapon.Init(_crosshairTarget);
+            //   weapon.OnClipEmpty += OnEmptyClip;
 
 
-            _weapons.Add(weapon);
+            //      _weapons.Add(weapon);
 
-            AttachWeaponToSocket(weapon, _armoryEquipSocket);
+            //       AttachWeaponToSocket(weapon, _armoryEquipSocket);
         }
     }
     private void AttachWeaponToSocket(BaseWeapon weapon, Transform socket)
@@ -142,7 +172,8 @@ public class WeaponOwnerComponent : MonoBehaviour
         if (!weapon) return;
 
         weapon.transform.SetParent(socket);
-        weapon.transform.position = socket.position;
+        weapon.transform.localPosition = Vector3.zero;
+        weapon.transform.localRotation = Quaternion.identity;
     }
 
     private void InitAnimations()
@@ -181,7 +212,7 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         _equipAnimInProgress = false;
     }
-  private  void OnRealoadFinished()
+    private void OnRealoadFinished()
     {
         _reloadAnimInProgress = false;
     }
@@ -193,21 +224,21 @@ public class WeaponOwnerComponent : MonoBehaviour
 
     private void OnEmptyClip(BaseWeapon ammoEmpty)
     {
-        if (!ammoEmpty)
-            return;
+        /*      if (!ammoEmpty)
+                  return;
 
-        if (_currentWeapon == ammoEmpty)
-            ChangeClip();
-        else
-        {
-            foreach (var weapon in _weapons)
-            {
-                if (weapon != ammoEmpty)
-                    continue;
-                weapon.ChangeClip();
-                break;
-            }
-        }
+              if (_currentWeapon == ammoEmpty)
+                  ChangeClip();
+              else
+              {
+                  foreach (var weapon in _weapons)
+                  {
+                      if (weapon != ammoEmpty)
+                          continue;
+                      weapon.ChangeClip();
+                      break;
+                  }
+              }*/
     }
     private void ChangeClip()
     {
@@ -218,6 +249,16 @@ public class WeaponOwnerComponent : MonoBehaviour
         _reloadAnimInProgress = true;
         PlayAnimMontage(_currentReloadAnim);
     }
-  
+    [ContextMenu("Save weapon pose")]
+    private void SaveWeaponPose()
+    {
+        GameObjectRecorder gameObjectRecorder = new GameObjectRecorder(gameObject);
+        gameObjectRecorder.BindComponentsOfType<Transform>(_weaponEquipSocket.gameObject, false);
+        gameObjectRecorder.BindComponentsOfType<Transform>(_leftGrip.gameObject, false);
+        gameObjectRecorder.BindComponentsOfType<Transform>(_rightGrip.gameObject, false);
+        gameObjectRecorder.TakeSnapshot(0.0f);
+        gameObjectRecorder.SaveToClip(_currentWeapon.WeaponAnimation);
+        UnityEditor.AssetDatabase.SaveAssets();
+    }
 
 }

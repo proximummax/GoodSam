@@ -1,33 +1,30 @@
-
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PistolWeapon : BaseWeapon
 {
-    [SerializeField] private float _timeBetweenShots = 0.1f;
     [SerializeField] private float _bulletSpread = 1.5f;
     [SerializeField] private float _damageAmount = 10.0f;
 
-    [SerializeField] private ParticleSystem _traceFX;
+    [SerializeField] private TrailRenderer _traceFX;
     [SerializeField] private ParticleSystem _muzzleFlashFX;
-    [SerializeField] private GameObject _impactEffect;
-    // [SerializeField] private Vector3 _bulletSpread;
-    //FX
+    [SerializeField] private ParticleSystem _hitEffect;
 
+    float _elapsedTime = 0.0f;
     public override void StartFire()
     {
-
-        //    InitMuzzleFX();
-        //  GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTRifleWeapon::MakeShot, TimeBetweenShots, true);
+        _elapsedTime = 0.0f;
+        _muzzleFlashFX.Emit(1);
+        
         MakeShot();
     }
 
+   
     public override void StopFire()
     {
-        //      GetWorldTimerManager().ClearTimer(ShotTimerHandle);
-        //    SetMuzzleFXVisibility(false);
+
     }
+
     protected override bool GetTraceData(ref Vector3 traceStart, ref Vector3 direction)
     {
         Vector3 viewLocation = new Vector3();
@@ -36,8 +33,9 @@ public class PistolWeapon : BaseWeapon
         GetPlayerViewPoint(ref viewLocation, ref viewRotation);
         traceStart = viewLocation;
 
-        direction = Random.insideUnitSphere * _bulletSpread + Camera.main.transform.forward;
-        direction.Normalize();
+        direction = _crosshairTarget.transform.position - viewLocation;
+     //   direction = Random.insideUnitSphere * _bulletSpread + Camera.main.transform.forward;
+     //   direction.Normalize();
 
         return true;
     }
@@ -46,7 +44,6 @@ public class PistolWeapon : BaseWeapon
     {
         if (IsAmmoEmpty())
         {
-            Debug.Log("no ammo");
             StopFire();
             return;
         }
@@ -60,36 +57,36 @@ public class PistolWeapon : BaseWeapon
 
         RaycastHit hitResult;
         MakeHit(out hitResult, traceStart, direction);
-
-        Vector3 traceFXEnd = traceStart + direction * TraceMaxDistance;
+        
+        var tracer = Instantiate(_traceFX, MuzzleSocket.transform.position, Quaternion.identity);
+        tracer.AddPosition(MuzzleSocket.transform.position);
 
         if (hitResult.collider != null)
         {
-            Debug.Log(hitResult.collider.gameObject.name);
             if (hitResult.collider.TryGetComponent(out HitBox hitBox))
             {
                 hitBox.ApplyHit(_damageAmount);
-                // traceFXEnd = hitResult.ImpactPoint;
-                MakeDamage(hitResult);
-            }
-            var impact = Instantiate(_impactEffect, hitResult.point, Quaternion.LookRotation(hitResult.normal));
-            Destroy(impact, 2.0f);
 
-            //  WeaponFXComponent->PlayImpactFX(hitResult);
+                MakeDamage(hitResult);
+
+               
+            }
+            tracer.transform.position = hitResult.point;
+            _hitEffect.transform.position = hitResult.point;
+            _hitEffect.transform.forward = hitResult.normal;
+            _hitEffect.Emit(1);
+     
         }
-        // SpawnTraceFX(out ParticleSystem traceFX);
-        //  StartCoroutine(MoveTraceFX(traceFX, MuzzleSocket.transform.position, traceFXEnd, 5.0f));
         DecreaseAmmo();
     }
+
+
     private void MakeDamage(RaycastHit hitResult)
     {
 
 
     }
-    private void SpawnTraceFX(out ParticleSystem traceFX)
-    {
-        traceFX = Instantiate(_traceFX);
-    }
+   
     private IEnumerator MoveTraceFX(ParticleSystem traceFX, Vector3 traceStart, Vector3 traceEnd, float timeToReachEndPoint)
     {
         traceFX.transform.position = traceStart;

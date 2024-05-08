@@ -24,20 +24,20 @@ public class MoveToPosition : ActionNode
 
     protected override State OnUpdate() {
         if (context.agent.pathPending) {
-            context.animationComponent.SetRunState(true);
+           // context.animationComponent.SetRunState(true);
             return State.Running;
         }
 
         if (context.agent.remainingDistance < tolerance) {
-            context.animationComponent.SetRunState(false);
+          //  context.animationComponent.SetRunState(false);
             return State.Success;
         }
 
         if (context.agent.pathStatus == UnityEngine.AI.NavMeshPathStatus.PathInvalid) {
-            context.animationComponent.SetRunState(false);
+          //  context.animationComponent.SetRunState(false);
             return State.Failure;
         }
-        context.animationComponent.SetRunState(true);
+       // context.animationComponent.SetRunState(true);
         return State.Running;
     }
 }
