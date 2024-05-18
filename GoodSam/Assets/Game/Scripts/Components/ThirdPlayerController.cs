@@ -19,8 +19,15 @@ public class ThirdPlayerController : MonoBehaviour
         _playerInput.Enable();
 
         _weaponOwner = GetComponent<WeaponOwnerComponent>();
+
+        _playerInput.Player.SelectWeapon_1.performed += _weaponOwner.SelectWeapon;
+        _playerInput.Player.SelectWeapon_2.performed += _weaponOwner.SelectWeapon;
+
         _playerInput.Player.Shoot.performed += _weaponOwner.StartFire;
         _playerInput.Player.Shoot.canceled += _weaponOwner.StopFire;
+
+        _playerInput.Player.Holster.performed += _weaponOwner.Holster;
+
     }
     private void OnDisable()
     {

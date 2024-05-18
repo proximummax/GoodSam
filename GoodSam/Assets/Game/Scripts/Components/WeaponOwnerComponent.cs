@@ -1,6 +1,6 @@
+using Cinemachine;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
@@ -8,53 +8,77 @@ using UnityEngine.InputSystem;
 
 public class WeaponOwnerComponent : MonoBehaviour
 {
+    public enum EWeaponSlot
+    {
+        Primary,
+        Secondary
+    }
+
     [SerializeField] private CrosshairTarget _crosshairTarget;
     [SerializeField] private List<BaseWeapon> _weaponDatas;
-    [SerializeField] private Transform _weaponEquipSocket;
-    [SerializeField] private Transform _armoryEquipSocket;
+    [SerializeField] private Transform[] _weaponSlots;
+
     [Header("Animations")]
     [SerializeField] private Transform _leftGrip;
     [SerializeField] private Transform _rightGrip;
     [SerializeField] private Rig _handIK;
 
-    [SerializeField] private BaseWeapon _currentWeapon = null;
 
-    private Animator _animator;
-    private AnimatorOverrideController _overrides;
-    //   private List<BaseWeapon> _weapons = new List<BaseWeapon>();
-    //  private int _currentWeaponIndex = 0;
+    [SerializeField] private Animator _rigAnimator;
 
-    private Animation _currentReloadAnim = null;
-    private bool _equipAnimInProgress = false;
-    private bool _reloadAnimInProgress = false;
+    [SerializeField] private CinemachineFreeLook _playerCamera;
 
-    private bool _firstEquip = true;
+    private BaseWeapon[] _equipedWeapons = new BaseWeapon[2];
+    private int _currentWeaponIndex = 0;
+
+    private bool _isHolstered = false;
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
-        _overrides = _animator.runtimeAnimatorController as AnimatorOverrideController;
-
-        _handIK.weight = 0.0f;
-        _animator.SetLayerWeight(1, 0.0f);
 
         InitAnimations();
         //    _currentWeaponIndex = 0;
         //   SpawnWeapons();
-        EquipWeapon(_currentWeapon);
+    }
+    public BaseWeapon GetWeapon(int index)
+    {
+        if (index < 0 || index >= _equipedWeapons.Length)
+            return null;
+        return _equipedWeapons[index];
     }
     public void StartFire(InputAction.CallbackContext context)
     {
-        Debug.Log("call?");
         if (!CanFire()) return;
-        Debug.Log("can?");
-        _currentWeapon.StartFire();
+        GetWeapon(_currentWeaponIndex).StartFire();
     }
     public void StopFire(InputAction.CallbackContext context)
     {
-        if (!_currentWeapon) return;
-        _currentWeapon.StopFire();
+        if (!GetWeapon(_currentWeaponIndex)) return;
+        GetWeapon(_currentWeaponIndex).StopFire();
     }
+    public void Holster(InputAction.CallbackContext context)
+    {
+
+        bool isHolstered = _rigAnimator.GetBool("holster_weapon");
+        if (isHolstered)
+            StartCoroutine(ActivateWeapon(_currentWeaponIndex));
+        else
+            StartCoroutine(HolsterWeapon(_currentWeaponIndex));
+
+    }
+    public void SelectWeapon(InputAction.CallbackContext context)
+    {
+        switch (context.action.name)
+        {
+            case "SelectWeapon_1":
+                StartCoroutine(SwitchWeapon(_currentWeaponIndex, EWeaponSlot.Primary));
+                break;
+            case "SelectWeapon_2":
+                StartCoroutine(SwitchWeapon(_currentWeaponIndex, EWeaponSlot.Secondary));
+                break;
+        }
+    }
+
     public void NextWeapon()
     {
         if (!CanEquip())
@@ -71,19 +95,19 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         uiData = null;
 
-        if (!_currentWeapon)
+        if (!GetWeapon(_currentWeaponIndex))
             return false;
 
-        uiData = _currentWeapon.GetUIData();
+        uiData = GetWeapon(_currentWeaponIndex).GetUIData();
         return true;
     }
     public bool GetAmmoData(out AmmoData ammoData)
     {
         ammoData = null;
-        if (!_currentWeapon)
+        if (!GetWeapon(_currentWeaponIndex))
             return false;
 
-        ammoData = _currentWeapon.GetAmmoData();
+        ammoData = GetWeapon(_currentWeaponIndex).GetAmmoData();
         return true;
     }
 
@@ -111,115 +135,94 @@ public class WeaponOwnerComponent : MonoBehaviour
         }*/
     protected bool CanFire()
     {
-        return _currentWeapon && !_equipAnimInProgress && !_reloadAnimInProgress;
+        return GetWeapon(_currentWeaponIndex) && !_isHolstered;//&& !_reloadAnimInProgress;
     }
     protected bool CanEquip()
     {
-        return !_equipAnimInProgress && !_reloadAnimInProgress;
+        return true;
     }
     public void EquipWeapon(BaseWeapon weapon)
     {
-        //  if (weaponIndex < 0 || weaponIndex >= _weapons.Count) return;
         if (weapon == null) return;
 
-        if (_currentWeapon && _firstEquip == false)
+        if (GetWeapon(_currentWeaponIndex))
         {
-            _currentWeapon.StopFire();
-            Destroy(_currentWeapon.gameObject);
-            //       AttachWeaponToSocket(_currentWeapon, _armoryEquipSocket);
+            GetWeapon(_currentWeaponIndex).StopFire();
+            //   Destroy(GetCurrentWeapon().gameObject);
         }
-        _firstEquip = false;
-        _currentWeapon = weapon;
+        int weaponIndex = (int)weapon.WeaponSlot;
+        _equipedWeapons[weaponIndex] = weapon;
 
-        AttachWeaponToSocket(_currentWeapon, _weaponEquipSocket);
-        _currentWeapon.Init(_crosshairTarget);
-        _currentWeapon.OnClipEmpty += OnEmptyClip;
 
-        //    var currentWeaponData = _weaponDatas.FirstOrDefault((x) => x.GetData().Weapon == _currentWeapon.GetData().Weapon);
+        AttachWeaponToSocket(weapon, _weaponSlots[(int)weapon.WeaponSlot]);
 
-        //    _currentReloadAnim = currentWeaponData ? currentWeaponData.GetData().ReloadAnim : null;
+        StartCoroutine(SwitchWeapon(_currentWeaponIndex, (EWeaponSlot)weaponIndex));
 
-        //  AttachWeaponToSocket(_currentWeapon, _weaponEquipSocket);
 
-        _handIK.weight = 1.0f;
-        _animator.SetLayerWeight(1, 1.0f);
-        Invoke(nameof(SetAnimationDelayed), 0.001f);
-       
+        weapon.Init(_crosshairTarget, _playerCamera, _rigAnimator);
+        weapon.OnClipEmpty += OnEmptyClip;
     }
 
-    private void SetAnimationDelayed()
+    private IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
     {
-        _overrides["weapon_anim_empty"] = _currentWeapon.WeaponAnimation;
+        if (holsterIndex == (int)activeSlot)
+            holsterIndex = -1;
+
+
+        yield return StartCoroutine(HolsterWeapon(holsterIndex));
+        yield return StartCoroutine(ActivateWeapon((int)activeSlot));
+        _currentWeaponIndex = (int)activeSlot;
     }
-    private void SpawnWeapons()
+    private IEnumerator HolsterWeapon(int weaponIndex)
     {
-        foreach (var weapon in _weaponDatas)
+        _isHolstered = true;
+        var weapon = GetWeapon(weaponIndex);
+        if (weapon)
         {
-            //var weapon = Instantiate(weaponData.Weapon, transform);
-            if (!weapon) continue;
-
-            //     weapon.Init(_crosshairTarget);
-            //   weapon.OnClipEmpty += OnEmptyClip;
-
-
-            //      _weapons.Add(weapon);
-
-            //       AttachWeaponToSocket(weapon, _armoryEquipSocket);
+            _rigAnimator.SetBool("holster_weapon", true);
+            do
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            while (_rigAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f);
         }
     }
+    private IEnumerator ActivateWeapon(int weaponIndex)
+    {
+        var weapon = GetWeapon(weaponIndex);
+        if (weapon)
+        {
+            _rigAnimator.SetBool("holster_weapon", false);
+            _rigAnimator.Play("equip_" + weapon.GunAnimatorName);
+            do
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            while (_rigAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f);
+        }
+        _isHolstered = false;
+    }
+
     private void AttachWeaponToSocket(BaseWeapon weapon, Transform socket)
     {
         if (!weapon) return;
 
-        weapon.transform.SetParent(socket);
-        weapon.transform.localPosition = Vector3.zero;
-        weapon.transform.localRotation = Quaternion.identity;
+        weapon.transform.SetParent(socket, false);
     }
 
     private void InitAnimations()
     {
-        /*
-          auto EquipFinishedNotify = AnimUtils::FindNotifyByClass<USTEquipFinishedAnimNotify>(EquipAnimMontage);
-	if (EquipFinishedNotify)
-	{
-		EquipFinishedNotify->OnNotified.AddUObject(this, &USTWeaponComponent::OnEquipFinished);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Equip anim notify is forgotten to set"));
-	}
-
-	for (auto WeaponData : WeaponsDatas)
-	{
-		auto ReloadFinishedNotify = AnimUtils::FindNotifyByClass<USTReloadFinishedAnimNotify>(WeaponData.ReloadAnimMontage);
-		if (!ReloadFinishedNotify)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Reload anim notify is forgotten to set"));
-		}
-
-		ReloadFinishedNotify->OnNotified.AddUObject(this, &USTWeaponComponent::OnRealoadFinished);
-        
-	}
-        */
+        _rigAnimator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+        _rigAnimator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+        _rigAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        _rigAnimator.updateMode = AnimatorUpdateMode.Normal;
     }
 
 
-    private void PlayAnimMontage(Animation animation)
-    {
-
-    }
-    private void OnEquipFinished()
-    {
-        _equipAnimInProgress = false;
-    }
-    private void OnRealoadFinished()
-    {
-        _reloadAnimInProgress = false;
-    }
 
     private bool CanReload()
     {
-        return _currentWeapon && !_equipAnimInProgress && !_reloadAnimInProgress && _currentWeapon.CanReload();
+        return GetWeapon(_currentWeaponIndex) && GetWeapon(_currentWeaponIndex).CanReload();
     }
 
     private void OnEmptyClip(BaseWeapon ammoEmpty)
@@ -244,21 +247,8 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         if (!CanReload()) return;
 
-        _currentWeapon.StopFire();
-        _currentWeapon.ChangeClip();
-        _reloadAnimInProgress = true;
-        PlayAnimMontage(_currentReloadAnim);
-    }
-    [ContextMenu("Save weapon pose")]
-    private void SaveWeaponPose()
-    {
-        GameObjectRecorder gameObjectRecorder = new GameObjectRecorder(gameObject);
-        gameObjectRecorder.BindComponentsOfType<Transform>(_weaponEquipSocket.gameObject, false);
-        gameObjectRecorder.BindComponentsOfType<Transform>(_leftGrip.gameObject, false);
-        gameObjectRecorder.BindComponentsOfType<Transform>(_rightGrip.gameObject, false);
-        gameObjectRecorder.TakeSnapshot(0.0f);
-        gameObjectRecorder.SaveToClip(_currentWeapon.WeaponAnimation);
-        UnityEditor.AssetDatabase.SaveAssets();
+        GetWeapon(_currentWeaponIndex).StopFire();
+        GetWeapon(_currentWeaponIndex).ChangeClip();
     }
 
 }

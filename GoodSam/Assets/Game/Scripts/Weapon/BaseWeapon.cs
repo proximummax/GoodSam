@@ -1,3 +1,4 @@
+using Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,7 +7,9 @@ public abstract class BaseWeapon : MonoBehaviour
     public UnityAction<BaseWeapon> OnClipEmpty;
 
     [Header("Weapon")]
+    protected BaseRecoil Recoil;
     protected CrosshairTarget _crosshairTarget;
+    [SerializeField] protected WeaponOwnerComponent.EWeaponSlot _weaponSlot;
     [SerializeField] protected Transform MuzzleSocket;
     [SerializeField] protected WeaponData WeaponData;
     [SerializeField] protected AmmoData DefaultAmmo;
@@ -16,8 +19,9 @@ public abstract class BaseWeapon : MonoBehaviour
     [SerializeField] protected WeaponUIData UIData;
 
     [Header("Animation")]
-    public AnimationClip WeaponAnimation;
-
+    [SerializeField] string _gunAnimatorName;
+    public string GunAnimatorName { get => _gunAnimatorName; }
+    public WeaponOwnerComponent.EWeaponSlot WeaponSlot { get => _weaponSlot; }
 
 
     private AmmoData _currentAmmo;
@@ -25,15 +29,17 @@ public abstract class BaseWeapon : MonoBehaviour
     protected virtual void Awake()
     {
         enabled = false;
-
+        Recoil = GetComponent<BaseRecoil>();
     }
-    public void Init(CrosshairTarget crosshairTarget)
+    public void Init(CrosshairTarget crosshairTarget, CinemachineFreeLook camera, Animator _rigController)
     {
         if (DefaultAmmo.Bullets <= 0)
             Debug.Log("BUllets count couldn`t be less of equal zero");
         if (DefaultAmmo.Clips <= 0)
             Debug.Log("Clips count couldn`t be less of equal zero");
 
+        Recoil._rigController = _rigController;
+        Recoil.PlayerCamera = camera;
         _crosshairTarget = crosshairTarget;
         _currentAmmo = DefaultAmmo;
     }
@@ -41,7 +47,7 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         return WeaponData;
     }
-   
+
     public abstract void StartFire();
     public abstract void StopFire();
 

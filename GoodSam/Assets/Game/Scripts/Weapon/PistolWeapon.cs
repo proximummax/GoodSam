@@ -17,6 +17,7 @@ public class PistolWeapon : BaseWeapon
         _muzzleFlashFX.Emit(1);
         
         MakeShot();
+        Recoil.GenerateRecoil(GunAnimatorName);
     }
 
    
