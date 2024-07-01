@@ -1,22 +1,19 @@
 using System.Collections;
 using UnityEngine;
 
-public class PistolWeapon : BaseWeapon
+public class BulletWeapon : BaseWeapon
 {
-    [SerializeField] private float _bulletSpread = 1.5f;
-    [SerializeField] private float _damageAmount = 10.0f;
 
     [SerializeField] private ParticleSystem _muzzleFlashFX;
-   
 
-
+    [SerializeField] private float _bulletSpread = 1.5f;
+    [SerializeField] private float _damageAmount = 10.0f;
     public override void StartFire()
     {
         base.StartFire();
         _muzzleFlashFX.Emit(1);
 
-        MakeShot();
-      
+     //   MakeShot();
     }
 
     public override void StopFire()
@@ -34,8 +31,6 @@ public class PistolWeapon : BaseWeapon
         traceStart = viewLocation;
 
         direction = _crosshairTarget.transform.position - viewLocation;
-        //   direction = Random.insideUnitSphere * _bulletSpread + Camera.main.transform.forward;
-        //   direction.Normalize();
 
         return true;
     }

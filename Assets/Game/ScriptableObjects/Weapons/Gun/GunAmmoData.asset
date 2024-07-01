@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01293e762cd756146bbe23a7547bc470, type: 3}
   m_Name: GunAmmoData
   m_EditorClassIdentifier: 
-  Bullets: 12
+  Bullets: 20
   Clips: 2
   Infinite: 0

@@ -5,25 +5,34 @@ public class AnimationComponent : MonoBehaviour
 {
     private readonly int INPUT_X = Animator.StringToHash("InputX");
     private readonly int INPUT_Y = Animator.StringToHash("InputY");
-
-    private Animator _animator;
+    private readonly int IS_JUMPING = Animator.StringToHash("isJumping");
+   public Animator Animator { get; private set; }
     private ThirdPlayerController _thirdPlayerController;
+
+
     private void Awake()
     {
         _thirdPlayerController = GetComponent<ThirdPlayerController>();
-        _animator = GetComponent<Animator>();
+        Animator = GetComponent<Animator>();
     }
     public void Enable()
     {
-        _animator.enabled = true;
+        Animator.enabled = true;
     }
     public void Disable()
     {
-        _animator.enabled = false;
+        Animator.enabled = false;
+    }
+    public void SetJumpingState(bool state)
+    {
+        Animator.SetBool(IS_JUMPING, state);
     }
     private void Update()
     {
-        _animator.SetFloat(INPUT_X, _thirdPlayerController.Input.x);
-        _animator.SetFloat(INPUT_Y, _thirdPlayerController.Input.y);
+        Animator.SetFloat(INPUT_X, _thirdPlayerController.Input.x);
+        Animator.SetFloat(INPUT_Y, _thirdPlayerController.Input.y);
+        Debug.Log(_thirdPlayerController.Input);
     }
+
+  
 }

@@ -50,10 +50,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _weaponSlot: 0
   MuzzleSocket: {fileID: 2320448231387115092}
-  WeaponData: {fileID: 11400000, guid: 17e396f98e6153f41b406c5c13449acf, type: 2}
+  WeaponData: {fileID: 11400000, guid: 831af7b5c06779446ac42abf3964e0b8, type: 2}
   DefaultAmmo: {fileID: 11400000, guid: b3aeb5f9d2753ca4dbc60f011e88581b, type: 2}
   TraceMaxDistance: 1000
-  UIData: {fileID: 11400000, guid: 83d861882963c2b409dde8006f9b605c, type: 2}
+  UIData: {fileID: 11400000, guid: 97b1410850e32f24f95b626657323779, type: 2}
   _gunAnimatorName: gun
   FireRate: 10
   BulletSpeed: 20
@@ -61,9 +61,9 @@ MonoBehaviour:
   MaxLifeTime: 3
   TraceFX: {fileID: 1328001142294063171, guid: aa85aa3198caac3448ea11b2910c0929, type: 3}
   HitEffect: {fileID: 6001105449496006640}
-  _bulletSpread: 0
-  _damageAmount: 10
   _muzzleFlashFX: {fileID: 3903372756018692836}
+  _bulletSpread: 1.5
+  _damageAmount: 10
 --- !u!114 &-8678917606348715078
 MonoBehaviour:
   m_ObjectHideFlags: 0

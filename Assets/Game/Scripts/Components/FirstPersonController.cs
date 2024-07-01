@@ -9,8 +9,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using Unity.VisualScripting;
-
 
 
 #if UNITY_EDITOR
@@ -158,12 +156,10 @@ public class FirstPersonController : MonoBehaviour
             sprintCooldownReset = sprintCooldown;
         }
 
-        _playerInput.Player.Jump.performed += OnJump;
-        _playerInput.Player.Jump.canceled += OnJump;
+     //   _playerInput.Player.Jump.performed += OnJump;
+      //  _playerInput.Player.Jump.canceled += OnJump;
 
         _weaponOwner = GetComponent<WeaponOwnerComponent>();
-        _playerInput.Player.Shoot.performed += _weaponOwner.StartFire;
-        _playerInput.Player.Shoot.canceled += _weaponOwner.StopFire;
     }
 
     private void OnEnable()

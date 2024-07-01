@@ -5,7 +5,9 @@ using UnityEngine.Events;
 
 public abstract class BaseWeapon : MonoBehaviour
 {
+    [HideInInspector]
     public UnityAction<BaseWeapon> OnClipEmpty;
+    public UnityAction<int> OnAmmoChanged;
 
     [Header("Weapon")]
     protected BaseRecoil Recoil;
@@ -16,6 +18,7 @@ public abstract class BaseWeapon : MonoBehaviour
     [SerializeField] protected AmmoData DefaultAmmo;
     [SerializeField] protected float TraceMaxDistance;
 
+
     [Header("UI")]
     [SerializeField] protected WeaponUIData UIData;
 
@@ -24,7 +27,7 @@ public abstract class BaseWeapon : MonoBehaviour
     public string GunAnimatorName { get => _gunAnimatorName; }
     public WeaponOwnerComponent.EWeaponSlot WeaponSlot { get => _weaponSlot; }
 
-    private AmmoData _currentAmmo;
+   private AmmoData _currentAmmo;
     [Header("Bullet settings")]
     [SerializeField] protected float FireRate = 25;
     [SerializeField] protected float BulletSpeed = 1000;
@@ -37,6 +40,10 @@ public abstract class BaseWeapon : MonoBehaviour
     [Header("FX")]
     [SerializeField] protected TrailRenderer TraceFX;
     [SerializeField] protected ParticleSystem HitEffect;
+
+
+
+
     public bool IsFiring { get; private set; }
     protected virtual void Awake()
     {
@@ -123,7 +130,10 @@ public abstract class BaseWeapon : MonoBehaviour
         Recoil._rigController = _rigController;
         Recoil.PlayerCamera = camera;
         _crosshairTarget = crosshairTarget;
-        _currentAmmo = DefaultAmmo;
+        _currentAmmo = ScriptableObject.CreateInstance<AmmoData>();
+        _currentAmmo.Init(DefaultAmmo);
+        Debug.Log("init?");
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
     }
     public WeaponData GetData()
     {
@@ -151,6 +161,8 @@ public abstract class BaseWeapon : MonoBehaviour
 
         _currentAmmo.Clips--;
         _currentAmmo.Bullets = DefaultAmmo.Bullets;
+
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
     }
     public bool CanReload()
     {
@@ -206,6 +218,7 @@ public abstract class BaseWeapon : MonoBehaviour
 
             _currentAmmo.Bullets = DefaultAmmo.Bullets;
         }
+
         return true;
     }
 
@@ -227,7 +240,6 @@ public abstract class BaseWeapon : MonoBehaviour
     protected void GetPlayerViewPoint(ref Vector3 viewLocation, ref Quaternion viewRotation)
     {
         viewLocation = MuzzleSocket.transform.position;
-        //viewLocation = Camera.main.transform.position;
         viewRotation = MuzzleSocket.transform.rotation;
 
     }
@@ -241,6 +253,9 @@ public abstract class BaseWeapon : MonoBehaviour
         if (_currentAmmo.Bullets == 0) return;
 
         _currentAmmo.Bullets--;
+
+        
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
 
         if (IsClipEmpty() && !IsAmmoEmpty())
         {

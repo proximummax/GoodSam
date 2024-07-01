@@ -34,6 +34,8 @@ public class WeaponOwnerComponent : MonoBehaviour
 
     private bool _isHolstered = false;
 
+    [Header("UI")]
+    [SerializeField] private WidgetsHolder _widgetsHolder;
     private void Start()
     {
 
@@ -107,10 +109,10 @@ public class WeaponOwnerComponent : MonoBehaviour
         //      _currentWeaponIndex = (_currentWeaponIndex + 1) % _weaponDatas.Count;
         //   EquipWeapon(_currentWeaponIndex);
     }
-    public void Reload(InputAction.CallbackContext context)
+    public void Reload(InputAction.CallbackContext context = default)
     {
         _reloadComponent.SetReloadTrigger();
-        //   ChangeClip();
+         ChangeClip();
     }
     public bool GetWeaponUIData(out WeaponUIData uiData)
     {
@@ -179,9 +181,9 @@ public class WeaponOwnerComponent : MonoBehaviour
 
         StartCoroutine(SwitchWeapon(_currentWeaponIndex, (EWeaponSlot)weaponIndex));
 
-
-        weapon.Init(_crosshairTarget, _playerCamera, _rigAnimator);
         weapon.OnClipEmpty += OnEmptyClip;
+        weapon.OnAmmoChanged += OnAmmoChanged;
+        weapon.Init(_crosshairTarget, _playerCamera, _rigAnimator);
     }
 
     private IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
@@ -193,6 +195,7 @@ public class WeaponOwnerComponent : MonoBehaviour
         yield return StartCoroutine(HolsterWeapon(holsterIndex));
         yield return StartCoroutine(ActivateWeapon((int)activeSlot));
         _currentWeaponIndex = (int)activeSlot;
+        OnAmmoChanged( GetActiveWeapon().GetAmmoData().Bullets);
     }
     private IEnumerator HolsterWeapon(int weaponIndex)
     {
@@ -248,13 +251,13 @@ public class WeaponOwnerComponent : MonoBehaviour
 
     private void OnEmptyClip(BaseWeapon ammoEmpty)
     {
-      //  ammoEmpty.TryToAddAmmo(1);
-        /*      if (!ammoEmpty)
+        Debug.Log("clip is empty");
+              if (!ammoEmpty)
                   return;
 
-              if (_currentWeapon == ammoEmpty)
-                  ChangeClip();
-              else
+              if (GetActiveWeapon() == ammoEmpty)
+                  Reload();
+          /*    else
               {
                   foreach (var weapon in _weapons)
                   {
@@ -269,8 +272,12 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         if (!CanReload()) return;
 
+        Debug.Log("can reaload");
         GetWeapon(_currentWeaponIndex).StopFire();
         GetWeapon(_currentWeaponIndex).ChangeClip();
     }
-
+    private void OnAmmoChanged(int ammo)
+    {
+        _widgetsHolder.AmmoWidget.Refresh(ammo);
+    }
 }

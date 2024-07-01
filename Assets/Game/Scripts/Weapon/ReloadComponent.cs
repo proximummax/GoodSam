@@ -34,8 +34,6 @@ public class ReloadComponent : MonoBehaviour
     }
     public void AttachMagazine()
     {
-        Debug.Log("do");
-        var weapon = _weaponOwner.GetActiveWeapon();
-        weapon.TryToAddAmmo(1);
+        Debug.Log("TODO: ATTACH MAGAZINE");
     }
 }
