@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/DownloadedAssets/PolygonCyberCity/Scenes/Demo_City.unity
+    guid: c623c0b72fb95f143b7860e201bac88d
   m_configObjects: {}

@@ -10,7 +10,7 @@ public abstract class BaseWeapon : MonoBehaviour
     public UnityAction<int> OnAmmoChanged;
 
     [Header("Weapon")]
-    protected BaseRecoil Recoil;
+    [HideInInspector] public BaseRecoil Recoil;
     protected CrosshairTarget _crosshairTarget;
     [SerializeField] protected WeaponOwnerComponent.EWeaponSlot _weaponSlot;
     [SerializeField] protected Transform MuzzleSocket;
@@ -120,7 +120,7 @@ public abstract class BaseWeapon : MonoBehaviour
             _accumulatedTime -= fireInterval;
         }
     }
-    public void Init(CrosshairTarget crosshairTarget, CinemachineFreeLook camera, Animator _rigController)
+    public void Init(CrosshairTarget crosshairTarget, AimingComponent _aimingComponent, Animator _rigController)
     {
         if (DefaultAmmo.Bullets <= 0)
             Debug.Log("BUllets count couldn`t be less of equal zero");
@@ -128,11 +128,11 @@ public abstract class BaseWeapon : MonoBehaviour
             Debug.Log("Clips count couldn`t be less of equal zero");
 
         Recoil._rigController = _rigController;
-        Recoil.PlayerCamera = camera;
+        Recoil.AimingComponent = _aimingComponent;
         _crosshairTarget = crosshairTarget;
         _currentAmmo = ScriptableObject.CreateInstance<AmmoData>();
         _currentAmmo.Init(DefaultAmmo);
-        Debug.Log("init?");
+
         OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
     }
     public WeaponData GetData()

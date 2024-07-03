@@ -18,6 +18,7 @@ public class WeaponOwnerComponent : MonoBehaviour
     [SerializeField] private List<BaseWeapon> _weaponDatas;
     [SerializeField] private Transform[] _weaponSlots;
     [SerializeField] private ReloadComponent _reloadComponent;
+    public ReloadComponent ReloadComponent { get { return _reloadComponent; } }
 
     [Header("Animations")]
     [SerializeField] private Transform _leftGrip;
@@ -27,12 +28,13 @@ public class WeaponOwnerComponent : MonoBehaviour
 
     [SerializeField] private Animator _rigAnimator;
 
-    [SerializeField] private CinemachineFreeLook _playerCamera;
+    [SerializeField] private AimingComponent _aimingComponent;
 
     private BaseWeapon[] _equipedWeapons = new BaseWeapon[2];
     private int _currentWeaponIndex = 0;
 
     private bool _isHolstered = false;
+    public bool IsChangingWeapon { get; private set; } = false;
 
     [Header("UI")]
     [SerializeField] private WidgetsHolder _widgetsHolder;
@@ -43,13 +45,15 @@ public class WeaponOwnerComponent : MonoBehaviour
         //    _currentWeaponIndex = 0;
         //   SpawnWeapons();
     }
-    private void LateUpdate()
+    private void Update()
     {
         var weapon = GetWeapon(_currentWeaponIndex);
-        if (weapon && weapon.IsFiring)
+        bool notSprinting = _rigAnimator.GetCurrentAnimatorStateInfo(2).shortNameHash == Animator.StringToHash("notSprinting");
+        if (weapon && !_isHolstered && notSprinting)
         {
             if (weapon.IsFiring)
                 weapon.UpdateFiring(Time.deltaTime);
+
             weapon.UpdateBullets(Time.deltaTime);
         }
 
@@ -183,7 +187,7 @@ public class WeaponOwnerComponent : MonoBehaviour
 
         weapon.OnClipEmpty += OnEmptyClip;
         weapon.OnAmmoChanged += OnAmmoChanged;
-        weapon.Init(_crosshairTarget, _playerCamera, _rigAnimator);
+        weapon.Init(_crosshairTarget, _aimingComponent, _rigAnimator);
     }
 
     private IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
@@ -191,14 +195,16 @@ public class WeaponOwnerComponent : MonoBehaviour
         if (holsterIndex == (int)activeSlot)
             holsterIndex = -1;
 
-
+        _rigAnimator.SetInteger("weapon_index", (int)activeSlot);
         yield return StartCoroutine(HolsterWeapon(holsterIndex));
         yield return StartCoroutine(ActivateWeapon((int)activeSlot));
         _currentWeaponIndex = (int)activeSlot;
-        OnAmmoChanged( GetActiveWeapon().GetAmmoData().Bullets);
+        if(GetActiveWeapon())
+            OnAmmoChanged( GetActiveWeapon().GetAmmoData().Bullets);
     }
     private IEnumerator HolsterWeapon(int weaponIndex)
     {
+        IsChangingWeapon = true;
         _isHolstered = true;
         var weapon = GetWeapon(weaponIndex);
         if (weapon)
@@ -210,9 +216,11 @@ public class WeaponOwnerComponent : MonoBehaviour
             }
             while (_rigAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f);
         }
+        IsChangingWeapon = false;
     }
     private IEnumerator ActivateWeapon(int weaponIndex)
     {
+        IsChangingWeapon = true;
         var weapon = GetWeapon(weaponIndex);
         if (weapon)
         {
@@ -225,6 +233,7 @@ public class WeaponOwnerComponent : MonoBehaviour
             while (_rigAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f);
         }
         _isHolstered = false;
+        IsChangingWeapon = false;
     }
 
     private void AttachWeaponToSocket(BaseWeapon weapon, Transform socket)

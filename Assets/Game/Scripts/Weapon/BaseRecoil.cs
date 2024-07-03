@@ -1,11 +1,9 @@
 using Cinemachine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseRecoil : MonoBehaviour
 {
-    [HideInInspector] public CinemachineFreeLook PlayerCamera;
+    [HideInInspector] public AimingComponent AimingComponent;
     [HideInInspector] public Animator _rigController;
     private CinemachineImpulseSource _cameraShake;
 
@@ -13,6 +11,7 @@ public class BaseRecoil : MonoBehaviour
     [SerializeField] private Vector2[] _recoilPattern;
 
     [SerializeField] private float _duration;
+    public float RecoilModifier = 1.0f;
 
 
     private float _elapsedTime;
@@ -48,8 +47,8 @@ public class BaseRecoil : MonoBehaviour
     {
         if (_elapsedTime > 0 && _recoilPattern.Length > 0)
         {
-            PlayerCamera.m_YAxis.Value -= (_currentRecoil.y * Time.deltaTime) / _duration;
-            PlayerCamera.m_XAxis.Value -= (_currentRecoil.x * Time.deltaTime) / _duration;
+            AimingComponent.YAxis.Value -= ((_currentRecoil.y * Time.deltaTime) / _duration) * RecoilModifier;
+            AimingComponent.XAxis.Value -= ((_currentRecoil.x * Time.deltaTime) / _duration) * RecoilModifier;
             _elapsedTime -= Time.deltaTime;
         }
     }

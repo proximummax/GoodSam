@@ -7,6 +7,7 @@ public class ThirdPlayerController : MonoBehaviour
     private WeaponOwnerComponent _weaponOwner;
     private CharacterController _characterController;
     private AnimationComponent _animationComponent;
+    private AimingComponent _aimingComponent;
 
     [SerializeField] private float _jumpHeight;
     [SerializeField] private float _gravity;
@@ -18,6 +19,7 @@ public class ThirdPlayerController : MonoBehaviour
 
     private Vector3 _velocity;
     public bool IsJumping { get; private set; }
+    public bool IsSprinting { get; private set; } = false;
 
     public CharacterController CharacterController { get { return _characterController; } }
     public Vector2 Input { get; private set; }
@@ -29,6 +31,7 @@ public class ThirdPlayerController : MonoBehaviour
         _playerInput = new PlayerInput();
         _characterController = GetComponent<CharacterController>();
         _animationComponent = GetComponent<AnimationComponent>();
+        _aimingComponent = GetComponent<AimingComponent>();
     }
     private void OnEnable()
     {
@@ -47,8 +50,13 @@ public class ThirdPlayerController : MonoBehaviour
         _playerInput.Player.Reload.performed += _weaponOwner.Reload;
 
         _playerInput.Player.Jump.performed += Jump;
-      //    _playerInput.Player.Jump.canceled += Jump;
+        //    _playerInput.Player.Jump.canceled += Jump;
 
+        _playerInput.Player.Sprint.performed += delegate { IsSprinting = true; };
+        _playerInput.Player.Sprint.canceled += delegate { IsSprinting = false; };
+
+        _playerInput.Player.Zoom.started += delegate { _aimingComponent.OnAimingStateChanged(true); };
+        _playerInput.Player.Zoom.canceled += delegate { _aimingComponent.OnAimingStateChanged(false); };
     }
 
     private void OnDisable()
@@ -59,6 +67,8 @@ public class ThirdPlayerController : MonoBehaviour
     {
         Input = _playerInput.Player.Move.ReadValue<Vector2>();
         IsAiming = _playerInput.Player.Zoom.phase == InputActionPhase.Performed;
+        UpdateIsSprinting();
+        Debug.Log(IsSprinting);
     }
   
     private void OnAnimatorMove()
@@ -76,7 +86,21 @@ public class ThirdPlayerController : MonoBehaviour
             UpdateOnGround();
         }
     }
-
+    private bool IsSpringing()
+    {
+        return IsSprinting && (_weaponOwner.GetActiveWeapon() == null ||  
+            (_weaponOwner.GetActiveWeapon() != null &&
+            !_weaponOwner.GetActiveWeapon().IsFiring &&
+            !_weaponOwner.ReloadComponent.IsReloading &&
+            !_aimingComponent.IsAiming &&
+            !_weaponOwner.IsChangingWeapon));
+    }
+    private void UpdateIsSprinting()
+    {
+        //    bool isSprinting = 
+        Debug.Log(IsSpringing());
+        _animationComponent.SetSprintState(IsSpringing());
+    }
     private void UpdateOnGround()
     {
         Vector3 stepForwardAmount = _rootMotion * _groundSpeed;
