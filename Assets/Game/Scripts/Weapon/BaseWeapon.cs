@@ -12,7 +12,7 @@ public abstract class BaseWeapon : MonoBehaviour
     [Header("Weapon")]
     [HideInInspector] public BaseRecoil Recoil;
     protected CrosshairTarget _crosshairTarget;
-    [SerializeField] protected WeaponOwnerComponent.EWeaponSlot _weaponSlot;
+    [SerializeField] protected BaseWeaponOwnerComponent.EWeaponSlot _weaponSlot;
     [SerializeField] protected Transform MuzzleSocket;
     [SerializeField] protected WeaponData WeaponData;
     [SerializeField] protected AmmoData DefaultAmmo;
@@ -25,9 +25,9 @@ public abstract class BaseWeapon : MonoBehaviour
     [Header("Animation")]
     [SerializeField] string _gunAnimatorName;
     public string GunAnimatorName { get => _gunAnimatorName; }
-    public WeaponOwnerComponent.EWeaponSlot WeaponSlot { get => _weaponSlot; }
+    public BaseWeaponOwnerComponent.EWeaponSlot WeaponSlot { get => _weaponSlot; }
 
-   private AmmoData _currentAmmo;
+    private AmmoData _currentAmmo;
     [Header("Bullet settings")]
     [SerializeField] protected float FireRate = 25;
     [SerializeField] protected float BulletSpeed = 1000;
@@ -92,7 +92,7 @@ public abstract class BaseWeapon : MonoBehaviour
         {
             if (hitResult.collider.TryGetComponent(out HitBox hitBox))
             {
-                   hitBox.ApplyHit(100);
+                hitBox.ApplyHit(10);
 
             }
             HitEffect.transform.position = hitResult.point;
@@ -128,7 +128,8 @@ public abstract class BaseWeapon : MonoBehaviour
             Debug.Log("Clips count couldn`t be less of equal zero");
 
         Recoil._rigController = _rigController;
-        Recoil.AimingComponent = _aimingComponent;
+        if (_aimingComponent)
+            Recoil.AimingComponent = _aimingComponent;
         _crosshairTarget = crosshairTarget;
         _currentAmmo = ScriptableObject.CreateInstance<AmmoData>();
         _currentAmmo.Init(DefaultAmmo);
@@ -254,7 +255,7 @@ public abstract class BaseWeapon : MonoBehaviour
 
         _currentAmmo.Bullets--;
 
-        
+
         OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
 
         if (IsClipEmpty() && !IsAmmoEmpty())

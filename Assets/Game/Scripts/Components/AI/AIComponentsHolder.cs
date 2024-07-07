@@ -4,7 +4,7 @@ using TheKiwiCoder;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ComponentsHolder : MonoBehaviour
+public class AIComponentsHolder : MonoBehaviour
 {
     private HealthComponent _healthComponent;
     private NavMeshAgent _navMeshAgent;
@@ -16,11 +16,11 @@ public class ComponentsHolder : MonoBehaviour
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _behaviourRunner = GetComponent<BehaviourTreeRunner>();
 
-        _healthComponent.Died += OnDied;
+    //    _healthComponent.Died += OnDied;
     }
     private void OnDisable()
     {
-        _healthComponent.Died -= OnDied;
+      //  _healthComponent.Died -= OnDied;
     }
     private void OnDied()
     {

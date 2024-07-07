@@ -137,7 +137,7 @@ public class FirstPersonController : MonoBehaviour
 
     #endregion
 
-    private WeaponOwnerComponent _weaponOwner;
+    private BaseWeaponOwnerComponent _weaponOwner;
     private void Awake()
     {
         _playerInput = new PlayerInput();
@@ -159,7 +159,7 @@ public class FirstPersonController : MonoBehaviour
      //   _playerInput.Player.Jump.performed += OnJump;
       //  _playerInput.Player.Jump.canceled += OnJump;
 
-        _weaponOwner = GetComponent<WeaponOwnerComponent>();
+        _weaponOwner = GetComponent<BaseWeaponOwnerComponent>();
     }
 
     private void OnEnable()

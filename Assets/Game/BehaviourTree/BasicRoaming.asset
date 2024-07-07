@@ -38,7 +38,7 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 74a286b60eaf8ea45b9bd84db9ce177b
-  position: {x: -22, y: 118}
+  position: {x: -21.600037, y: 128.79999}
   blackboard:
     moveToPosition: {x: 0, y: 0, z: 0}
   description: 
@@ -62,12 +62,12 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: d654e6bf449ef0a4e9d4228651cef97e
-  position: {x: 148, y: 289}
+  position: {x: 208, y: 288.8}
   blackboard:
     moveToPosition: {x: 0, y: 0, z: 0}
   description: 
   drawGizmos: 0
-  duration: 0
+  duration: 5
 --- !u!114 &-2247863421084346560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,13 +83,13 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: 6bc6981b00778a744bc6d4097134e636
-  position: {x: -22, y: 289}
+  position: {x: -21.600037, y: 288.8}
   blackboard:
     moveToPosition: {x: 0, y: 0, z: 0}
   description: 
   drawGizmos: 0
-  speed: 0
-  stoppingDistance: 1
+  speed: 6.657874
+  stoppingDistance: 2
   updateRotation: 1
   acceleration: 40
   tolerance: 1
@@ -131,7 +131,7 @@ MonoBehaviour:
   state: 0
   started: 0
   guid: d04bf637707c95e47a9c7cf277172af9
-  position: {x: -207.22488, y: 289}
+  position: {x: -207.20001, y: 288.8}
   blackboard:
     moveToPosition: {x: 0, y: 0, z: 0}
   description: 

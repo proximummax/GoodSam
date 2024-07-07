@@ -5,14 +5,10 @@ using TheKiwiCoder;
 
 public class EnemyPosition : ActionNode
 {
-    private FirstPersonController _mainPlayer;
+    private ThirdPlayerController _mainPlayer;
     protected override void OnStart()
     {
-        _mainPlayer = FindObjectOfType<FirstPersonController>();
-        if(_mainPlayer == null)
-        {
-            Debug.LogWarning("Main player not found");
-        }
+       
     }
 
     protected override void OnStop()

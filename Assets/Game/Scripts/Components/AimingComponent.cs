@@ -9,8 +9,8 @@ public class AimingComponent : MonoBehaviour
 
     [SerializeField] private Transform _lookAt;
 
-    private AnimationComponent _animationComponent;
-    private WeaponOwnerComponent _weaponOwner;
+    private PlayerAnimationComponent _animationComponent;
+    private BaseWeaponOwnerComponent _weaponOwner;
 
     public Cinemachine.AxisState XAxis;
     public Cinemachine.AxisState YAxis;
@@ -20,8 +20,8 @@ public class AimingComponent : MonoBehaviour
     {
         _camera = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
-        _animationComponent = GetComponent<AnimationComponent>();
-        _weaponOwner = GetComponent<WeaponOwnerComponent>();
+        _animationComponent = GetComponent<PlayerAnimationComponent>();
+        _weaponOwner = GetComponent<BaseWeaponOwnerComponent>();
     }
     private void UpdateAiming()
     {

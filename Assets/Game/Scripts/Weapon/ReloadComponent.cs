@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(WeaponOwnerComponent))]
+[RequireComponent(typeof(BaseWeaponOwnerComponent))]
 public class ReloadComponent : MonoBehaviour
 {
 

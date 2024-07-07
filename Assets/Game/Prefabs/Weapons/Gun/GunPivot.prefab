@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1206266791766934314}
   - component: {fileID: -8678917606348715078}
   - component: {fileID: -6007549259985245898}
+  - component: {fileID: 3337504113685799503}
   m_Layer: 0
   m_Name: GunPivot
   m_TagString: Untagged
@@ -48,6 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232975b09c0d8b24dab40d560eb77933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Recoil: {fileID: 0}
   _weaponSlot: 0
   MuzzleSocket: {fileID: 2320448231387115092}
   WeaponData: {fileID: 11400000, guid: 831af7b5c06779446ac42abf3964e0b8, type: 2}
@@ -94,6 +96,7 @@ MonoBehaviour:
   - {x: 0.2, y: 1}
   - {x: 0.5, y: 1}
   _duration: 0.1
+  RecoilModifier: 1
 --- !u!114 &-6007549259985245898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,6 +150,27 @@ MonoBehaviour:
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
   m_DefaultVelocity: {x: 0, y: -1, z: 0}
+--- !u!65 &3337504113685799503
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877190145432262263}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 0.28, z: 0.58}
+  m_Center: {x: 0, y: -0.06, z: 0.14}
 --- !u!1 &3687978709719569933
 GameObject:
   m_ObjectHideFlags: 0

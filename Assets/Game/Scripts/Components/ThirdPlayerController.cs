@@ -4,9 +4,9 @@ using UnityEngine.InputSystem;
 public class ThirdPlayerController : MonoBehaviour
 {
     private PlayerInput _playerInput;
-    private WeaponOwnerComponent _weaponOwner;
+    private PlayerWeaponOwnerComponent _weaponOwner;
     private CharacterController _characterController;
-    private AnimationComponent _animationComponent;
+    private PlayerAnimationComponent _animationComponent;
     private AimingComponent _aimingComponent;
 
     [SerializeField] private float _jumpHeight;
@@ -30,14 +30,14 @@ public class ThirdPlayerController : MonoBehaviour
     {
         _playerInput = new PlayerInput();
         _characterController = GetComponent<CharacterController>();
-        _animationComponent = GetComponent<AnimationComponent>();
+        _animationComponent = GetComponent<PlayerAnimationComponent>();
         _aimingComponent = GetComponent<AimingComponent>();
     }
     private void OnEnable()
     {
         _playerInput.Enable();
 
-        _weaponOwner = GetComponent<WeaponOwnerComponent>();
+        _weaponOwner = GetComponent<PlayerWeaponOwnerComponent>();
 
         _playerInput.Player.SelectWeapon_1.performed += _weaponOwner.SelectWeapon;
         _playerInput.Player.SelectWeapon_2.performed += _weaponOwner.SelectWeapon;
@@ -68,7 +68,6 @@ public class ThirdPlayerController : MonoBehaviour
         Input = _playerInput.Player.Move.ReadValue<Vector2>();
         IsAiming = _playerInput.Player.Zoom.phase == InputActionPhase.Performed;
         UpdateIsSprinting();
-        Debug.Log(IsSprinting);
     }
   
     private void OnAnimatorMove()
@@ -97,8 +96,6 @@ public class ThirdPlayerController : MonoBehaviour
     }
     private void UpdateIsSprinting()
     {
-        //    bool isSprinting = 
-        Debug.Log(IsSpringing());
         _animationComponent.SetSprintState(IsSpringing());
     }
     private void UpdateOnGround()

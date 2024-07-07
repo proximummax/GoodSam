@@ -6,7 +6,7 @@ using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 
 
-public class WeaponOwnerComponent : MonoBehaviour
+public class BaseWeaponOwnerComponent : MonoBehaviour
 {
     public enum EWeaponSlot
     {
@@ -15,7 +15,6 @@ public class WeaponOwnerComponent : MonoBehaviour
     }
 
     [SerializeField] private CrosshairTarget _crosshairTarget;
-    [SerializeField] private List<BaseWeapon> _weaponDatas;
     [SerializeField] private Transform[] _weaponSlots;
     [SerializeField] private ReloadComponent _reloadComponent;
     public ReloadComponent ReloadComponent { get { return _reloadComponent; } }
@@ -26,18 +25,16 @@ public class WeaponOwnerComponent : MonoBehaviour
     [SerializeField] private Rig _handIK;
 
 
-    [SerializeField] private Animator _rigAnimator;
-
+    [SerializeField] protected Animator _rigAnimator;
     [SerializeField] private AimingComponent _aimingComponent;
 
     private BaseWeapon[] _equipedWeapons = new BaseWeapon[2];
-    private int _currentWeaponIndex = 0;
+    protected int _currentWeaponIndex = 0;
 
     private bool _isHolstered = false;
     public bool IsChangingWeapon { get; private set; } = false;
 
-    [Header("UI")]
-    [SerializeField] private WidgetsHolder _widgetsHolder;
+   
     private void Start()
     {
 
@@ -45,7 +42,7 @@ public class WeaponOwnerComponent : MonoBehaviour
         //    _currentWeaponIndex = 0;
         //   SpawnWeapons();
     }
-    private void Update()
+    protected virtual void Update()
     {
         var weapon = GetWeapon(_currentWeaponIndex);
         bool notSprinting = _rigAnimator.GetCurrentAnimatorStateInfo(2).shortNameHash == Animator.StringToHash("notSprinting");
@@ -69,6 +66,10 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         return GetWeapon(_currentWeaponIndex);
     }
+    protected void ResetWeapon()
+    {
+        _currentWeaponIndex = -1;
+    }
 
     public void StartFire(InputAction.CallbackContext context)
     {
@@ -82,16 +83,7 @@ public class WeaponOwnerComponent : MonoBehaviour
         GetWeapon(_currentWeaponIndex).StopFire();
 
     }
-    public void Holster(InputAction.CallbackContext context)
-    {
 
-        bool isHolstered = _rigAnimator.GetBool("holster_weapon");
-        if (isHolstered)
-            StartCoroutine(ActivateWeapon(_currentWeaponIndex));
-        else
-            StartCoroutine(HolsterWeapon(_currentWeaponIndex));
-
-    }
     public void SelectWeapon(InputAction.CallbackContext context)
     {
         switch (context.action.name)
@@ -116,7 +108,7 @@ public class WeaponOwnerComponent : MonoBehaviour
     public void Reload(InputAction.CallbackContext context = default)
     {
         _reloadComponent.SetReloadTrigger();
-         ChangeClip();
+        ChangeClip();
     }
     public bool GetWeaponUIData(out WeaponUIData uiData)
     {
@@ -168,14 +160,14 @@ public class WeaponOwnerComponent : MonoBehaviour
     {
         return true;
     }
-    public void EquipWeapon(BaseWeapon weapon)
+    public virtual void EquipWeapon(BaseWeapon weapon)
     {
+        Debug.Log("call equip");
         if (weapon == null) return;
 
         if (GetWeapon(_currentWeaponIndex))
         {
             GetWeapon(_currentWeaponIndex).StopFire();
-            //   Destroy(GetCurrentWeapon().gameObject);
         }
         int weaponIndex = (int)weapon.WeaponSlot;
         _equipedWeapons[weaponIndex] = weapon;
@@ -186,11 +178,11 @@ public class WeaponOwnerComponent : MonoBehaviour
         StartCoroutine(SwitchWeapon(_currentWeaponIndex, (EWeaponSlot)weaponIndex));
 
         weapon.OnClipEmpty += OnEmptyClip;
-        weapon.OnAmmoChanged += OnAmmoChanged;
+     
         weapon.Init(_crosshairTarget, _aimingComponent, _rigAnimator);
     }
 
-    private IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
+    protected virtual IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
     {
         if (holsterIndex == (int)activeSlot)
             holsterIndex = -1;
@@ -199,10 +191,11 @@ public class WeaponOwnerComponent : MonoBehaviour
         yield return StartCoroutine(HolsterWeapon(holsterIndex));
         yield return StartCoroutine(ActivateWeapon((int)activeSlot));
         _currentWeaponIndex = (int)activeSlot;
-        if(GetActiveWeapon())
-            OnAmmoChanged( GetActiveWeapon().GetAmmoData().Bullets);
+
+      //  if (GetActiveWeapon())
+     //       OnAmmoChanged(GetActiveWeapon().GetAmmoData().Bullets);
     }
-    private IEnumerator HolsterWeapon(int weaponIndex)
+    protected IEnumerator HolsterWeapon(int weaponIndex)
     {
         IsChangingWeapon = true;
         _isHolstered = true;
@@ -218,7 +211,7 @@ public class WeaponOwnerComponent : MonoBehaviour
         }
         IsChangingWeapon = false;
     }
-    private IEnumerator ActivateWeapon(int weaponIndex)
+    protected IEnumerator ActivateWeapon(int weaponIndex)
     {
         IsChangingWeapon = true;
         var weapon = GetWeapon(weaponIndex);
@@ -261,21 +254,21 @@ public class WeaponOwnerComponent : MonoBehaviour
     private void OnEmptyClip(BaseWeapon ammoEmpty)
     {
         Debug.Log("clip is empty");
-              if (!ammoEmpty)
-                  return;
+        if (!ammoEmpty)
+            return;
 
-              if (GetActiveWeapon() == ammoEmpty)
-                  Reload();
-          /*    else
-              {
-                  foreach (var weapon in _weapons)
-                  {
-                      if (weapon != ammoEmpty)
-                          continue;
-                      weapon.ChangeClip();
-                      break;
-                  }
-              }*/
+        if (GetActiveWeapon() == ammoEmpty)
+            Reload();
+        /*    else
+            {
+                foreach (var weapon in _weapons)
+                {
+                    if (weapon != ammoEmpty)
+                        continue;
+                    weapon.ChangeClip();
+                    break;
+                }
+            }*/
     }
     private void ChangeClip()
     {
@@ -285,8 +278,5 @@ public class WeaponOwnerComponent : MonoBehaviour
         GetWeapon(_currentWeaponIndex).StopFire();
         GetWeapon(_currentWeaponIndex).ChangeClip();
     }
-    private void OnAmmoChanged(int ammo)
-    {
-        _widgetsHolder.AmmoWidget.Refresh(ammo);
-    }
+   
 }

@@ -9,6 +9,7 @@ namespace TheKiwiCoder {
 
         protected override void OnStart() {
             startTime = Time.time;
+            Debug.Log("lets wait");
         }
 
         protected override void OnStop() {
@@ -16,7 +17,9 @@ namespace TheKiwiCoder {
 
         protected override State OnUpdate() {
             if (Time.time - startTime > duration) {
+                Debug.Log("stop wait");
                 return State.Success;
+               
             }
             return State.Running;
         }

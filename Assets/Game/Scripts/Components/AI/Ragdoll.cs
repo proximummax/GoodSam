@@ -5,10 +5,10 @@ using UnityEngine;
 public class Ragdoll : MonoBehaviour
 {
     private Rigidbody[] _rigidbodies;
-    private AnimationComponent _animationComponent;
+    private AIAnimationController _animationComponent;
     private void Start()
     {
-        _animationComponent = GetComponent<AnimationComponent>();
+        _animationComponent = GetComponent<AIAnimationController>();
         _rigidbodies = GetComponentsInChildren<Rigidbody>();
         DeactivateRagdoll();
     }
@@ -24,4 +24,5 @@ public class Ragdoll : MonoBehaviour
             rigidbody.isKinematic = false;
         _animationComponent.Disable();
     }
+
 }

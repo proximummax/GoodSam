@@ -3,16 +3,19 @@ using UnityEngine.Events;
 
 public class HealthComponent : MonoBehaviour
 {
+    [SerializeField] private AIHealthBar _healthBar;
     [SerializeField] private float _initHealth;
     private float _currentHealth;
 
-    private Ragdoll _ragdoll;
+
+    private HitEffect _hitEffect;
 
     public UnityAction Died;
     private void Start()
     {
         SetSubscribeStateOnHitsEvents(true);
-        _ragdoll = GetComponent<Ragdoll>();
+
+        _hitEffect = GetComponent<HitEffect>();
         _currentHealth = _initHealth;
     }
     private void OnDisable()
@@ -39,14 +42,15 @@ public class HealthComponent : MonoBehaviour
             return;
 
         _currentHealth -= amount;
+        _healthBar.SetPercentage(_currentHealth / _initHealth);
         if (_currentHealth <= 0.0f)
         {
             Die();
         }
+        _hitEffect.Apply();
     }
     private void Die()
     {
         Died?.Invoke();
-        _ragdoll.ActivateRagdoll();
     }
 }
