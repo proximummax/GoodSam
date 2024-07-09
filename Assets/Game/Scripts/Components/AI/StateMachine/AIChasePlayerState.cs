@@ -49,11 +49,10 @@ public class AIChasePlayerState : AIState
             _timer = agent.Config.MaxTime;
         }
 
-        if (agent.NavMeshAgent.hasPath)
-            agent.AnimationController.SetSpeed(agent.NavMeshAgent.velocity.magnitude);
-        else
-            agent.AnimationController.SetSpeed(0);
-
+      //  if (agent.NavMeshAgent.hasPath)
+        //    agent.AnimationController.SetSpeed(agent.NavMeshAgent.velocity.magnitude);
+      //  else
+       //     agent.AnimationController.SetSpeed(0);
 
     }
 

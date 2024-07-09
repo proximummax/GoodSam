@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIFindWeapon : AIState
+public class AIFindWeaponState : AIState
 {
     public AIStateID GetID()
     {
@@ -22,7 +22,17 @@ public class AIFindWeapon : AIState
 
     public void Update(AIAgent agent)
     {
-        
+        Debug.Log("call upd");
+        if (agent.NavMeshAgent.hasPath)
+            agent.AnimationController.SetSpeed(agent.NavMeshAgent.velocity.magnitude);
+        else
+            agent.AnimationController.SetSpeed(0);
+
+        if (agent.WeaponOwner.GetActiveWeapon())
+        {
+            Debug.Log("has weapon");
+            agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
+        }
     }
     private WeaponPickup FindClosestWeapon(AIAgent agent)
     {

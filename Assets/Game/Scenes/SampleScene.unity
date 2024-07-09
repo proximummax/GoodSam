@@ -173,7 +173,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 1779063780}
+        transform: {fileID: 1026741209}
         weight: 0
       m_Item1:
         transform: {fileID: 0}
@@ -197,8 +197,8 @@ MonoBehaviour:
         transform: {fileID: 0}
         weight: 0
     m_Offset: {x: 0, y: 0, z: 0}
-    m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MinLimit: -60
+    m_MaxLimit: 60
     m_AimAxis: 3
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -379,6 +379,11 @@ MonoBehaviour:
   _rigAnimator: {fileID: 1020318996}
   _aimingComponent: {fileID: 80005507}
   _widgetsHolder: {fileID: 489187922}
+--- !u!4 &80005520 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7829257235385709006, guid: 09a9f71b9fcf8d54192d783aea64ab1e, type: 3}
+  m_PrefabInstance: {fileID: 950712673}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &92314722 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2517815194236062436, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
@@ -5977,7 +5982,7 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 1779063780}
+        transform: {fileID: 1026741209}
         weight: 0
       m_Item1:
         transform: {fileID: 0}
@@ -6001,8 +6006,8 @@ MonoBehaviour:
         transform: {fileID: 0}
         weight: 0
     m_Offset: {x: 0, y: 0, z: 0}
-    m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MinLimit: -60
+    m_MaxLimit: 60
     m_AimAxis: 4
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -6587,7 +6592,10 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 5630137027328553261, guid: 09a9f71b9fcf8d54192d783aea64ab1e, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7829257235385709006, guid: 09a9f71b9fcf8d54192d783aea64ab1e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1026741209}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7488583850250087284, guid: 09a9f71b9fcf8d54192d783aea64ab1e, type: 3}
       insertIndex: 3
@@ -16387,6 +16395,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2886434748588776632, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
   m_PrefabInstance: {fileID: 1734741590}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1026741208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1026741209}
+  m_Layer: 8
+  m_Name: AimLookTo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1026741209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1026741208}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.23, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 80005520}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1057939850 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1459515043995198979, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
@@ -17135,6 +17174,33 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0.7, z: 0}
+--- !u!114 &1309418273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309418248}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb817692d1c21b4abfa5436b074d86d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _weight: 1
+  _humanBones:
+  - Bone: 7
+    Weight: 0.2
+  - Bone: 8
+    Weight: 0.5
+  - Bone: 54
+    Weight: 1
+  _angleLimit: 90
+  _distanceLimit: 1.5
+  _aimingElements:
+  - {fileID: 49288734}
+  - {fileID: 2033663547}
+  - {fileID: 684505744}
+  _rigBuilder: {fileID: 1309418271}
 --- !u!1 &1334783005
 GameObject:
   m_ObjectHideFlags: 0
@@ -22640,8 +22706,8 @@ MonoBehaviour:
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 1779063780}
-        weight: 0
+        transform: {fileID: 1026741209}
+        weight: 1
       m_Item1:
         transform: {fileID: 0}
         weight: 0
@@ -22664,8 +22730,8 @@ MonoBehaviour:
         transform: {fileID: 0}
         weight: 0
     m_Offset: {x: 0, y: 0, z: 0}
-    m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MinLimit: -45
+    m_MaxLimit: 45
     m_AimAxis: 4
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -22819,9 +22885,25 @@ PrefabInstance:
       propertyPath: m_StoppingDistance
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1925834928720787598, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2193026165990724433, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2672485622652090896, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2672485622652090896, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3546300765234506981, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 24.59
+      value: 24.46
       objectReference: {fileID: 0}
     - target: {fileID: 3546300765234506981, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22867,6 +22949,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 7482397720238519967, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      propertyPath: m_UpdateMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7482397720238519967, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      propertyPath: m_CullingMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8634516271480872167, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
       propertyPath: _initialState
       value: 3
@@ -22885,8 +22975,11 @@ PrefabInstance:
       addedObject: {fileID: 797266291}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4214574773953361503, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
-      insertIndex: 9
+      insertIndex: 8
       addedObject: {fileID: 1309418270}
+    - targetCorrespondingSourceObject: {fileID: 4214574773953361503, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
+      insertIndex: 9
+      addedObject: {fileID: 1309418273}
     - targetCorrespondingSourceObject: {fileID: 4214574773953361503, guid: 7568b89a3580eab4bacb566ce2183dd1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1309418271}
@@ -23327,13 +23420,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 0.2
+  m_Weight: 0.5
   m_Data:
     m_ConstrainedObject: {fileID: 1021398310}
     m_SourceObjects:
       m_Length: 1
       m_Item0:
-        transform: {fileID: 1779063780}
+        transform: {fileID: 1026741209}
         weight: 0
       m_Item1:
         transform: {fileID: 0}
@@ -23357,8 +23450,8 @@ MonoBehaviour:
         transform: {fileID: 0}
         weight: 0
     m_Offset: {x: 0, y: 0, z: 0}
-    m_MinLimit: -180
-    m_MaxLimit: 180
+    m_MinLimit: -60
+    m_MaxLimit: 60
     m_AimAxis: 2
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -23662,7 +23755,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Recoil: {fileID: 0}
   _weaponSlot: 0
-  MuzzleSocket: {fileID: 0}
+  _muzzleSocket: {fileID: 0}
   WeaponData: {fileID: 11400000, guid: 17e396f98e6153f41b406c5c13449acf, type: 2}
   DefaultAmmo: {fileID: 11400000, guid: dc7f09790601a4443a49972c02b14d66, type: 2}
   TraceMaxDistance: 1000

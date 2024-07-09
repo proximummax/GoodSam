@@ -48,8 +48,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232975b09c0d8b24dab40d560eb77933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Recoil: {fileID: 0}
   _weaponSlot: 1
-  MuzzleSocket: {fileID: 1797683982231676035}
+  _muzzleSocket: {fileID: 1797683982231676035}
   WeaponData: {fileID: 11400000, guid: 17e396f98e6153f41b406c5c13449acf, type: 2}
   DefaultAmmo: {fileID: 11400000, guid: dc7f09790601a4443a49972c02b14d66, type: 2}
   TraceMaxDistance: 1000
@@ -76,10 +77,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f058b2be8fdbba488c1d146e3bfe0b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 0}
+  AimingComponent: {fileID: 0}
   _rigController: {fileID: 0}
   _recoilPattern: []
   _duration: 0
+  RecoilModifier: 1
 --- !u!114 &-1719253738329381976
 MonoBehaviour:
   m_ObjectHideFlags: 0

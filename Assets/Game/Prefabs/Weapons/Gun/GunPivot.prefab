@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Recoil: {fileID: 0}
   _weaponSlot: 0
-  MuzzleSocket: {fileID: 2320448231387115092}
+  _muzzleSocket: {fileID: 2320448231387115092}
   WeaponData: {fileID: 11400000, guid: 831af7b5c06779446ac42abf3964e0b8, type: 2}
   DefaultAmmo: {fileID: 11400000, guid: b3aeb5f9d2753ca4dbc60f011e88581b, type: 2}
   TraceMaxDistance: 1000

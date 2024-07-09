@@ -22,7 +22,8 @@ public class AIAgent : MonoBehaviour
         StateMachine.RegisterState(new AIChasePlayerState());
         StateMachine.RegisterState(new AIDeathState());
         StateMachine.RegisterState(new AIIdleState());
-        StateMachine.RegisterState(new AIFindWeapon());
+        StateMachine.RegisterState(new AIFindWeaponState());
+        StateMachine.RegisterState(new AIAttackState());
 
         HealthBar = GetComponentInChildren<AIHealthBar>();
         Ragdoll = GetComponent<Ragdoll>();
@@ -49,7 +50,6 @@ public class AIAgent : MonoBehaviour
     private void OnDied()
     {
         StateMachine.ChangeState(AIStateID.Death);
-        // NavMeshAgent.enabled = false;
-
+        NavMeshAgent.enabled = false;
     }
 }

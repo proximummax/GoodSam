@@ -13,7 +13,9 @@ public abstract class BaseWeapon : MonoBehaviour
     [HideInInspector] public BaseRecoil Recoil;
     protected CrosshairTarget _crosshairTarget;
     [SerializeField] protected BaseWeaponOwnerComponent.EWeaponSlot _weaponSlot;
-    [SerializeField] protected Transform MuzzleSocket;
+    [SerializeField] private Transform _muzzleSocket;
+    public Transform MuzzleSocket { get => _muzzleSocket;}
+
     [SerializeField] protected WeaponData WeaponData;
     [SerializeField] protected AmmoData DefaultAmmo;
     [SerializeField] protected float TraceMaxDistance;

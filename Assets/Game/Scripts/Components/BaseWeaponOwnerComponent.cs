@@ -35,7 +35,7 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
     public bool IsChangingWeapon { get; private set; } = false;
 
    
-    private void Start()
+    protected virtual void Start()
     {
 
         InitAnimations();
