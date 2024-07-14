@@ -21,10 +21,9 @@ public class PlayerWeaponOwnerComponent : BaseWeaponOwnerComponent
     public override void EquipWeapon(BaseWeapon weapon)
     {
         base.EquipWeapon(weapon);
-        weapon.OnAmmoChanged += OnAmmoChanged;
-
     }
-    private void OnAmmoChanged(int ammo)
+
+    protected override void OnAmmoChanged(int ammo)
     {
         _widgetsHolder.AmmoWidget.Refresh(ammo);
     }

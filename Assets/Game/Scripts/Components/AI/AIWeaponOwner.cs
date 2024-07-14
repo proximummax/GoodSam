@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AIWeaponOwner : BaseWeaponOwnerComponent
@@ -7,6 +6,7 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     private WeaponIK _weaponIK;
     private bool _active = false;
     [SerializeField] private float _inaccuracy;
+
     protected override void Start()
     {
         base.Start();
@@ -16,18 +16,19 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     {
         base.EquipWeapon(weapon);
     }
+    
     protected override void Update()
     {
         if (_weaponIK.GetTarget() && GetActiveWeapon() && _active)
         {
             Vector3 target = _weaponIK.GetTarget().EnemyTarget.position;
             target += Random.insideUnitSphere * _inaccuracy;
-            if (GetActiveWeapon().IsFiring)
+            if (GetActiveWeapon().IsFiring && !ReloadComponent.IsReloading)
                 GetActiveWeapon().UpdateFiring(Time.deltaTime, target);
 
             GetActiveWeapon().UpdateBullets(Time.deltaTime);
-            // GetActiveWeapon().UpdateFiring
         }
+
     }
     public void SetFiringState(bool enabled)
     {
@@ -51,5 +52,15 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
         _weaponIK.SetAimTransform(GetActiveWeapon().MuzzleSocket);
         _active = true;
     }
+
     
+    protected override void OnAmmoChanged(int ammo)
+    {
+       
+    }
+    protected override void OnReloadExit()
+    {
+        base.OnReloadExit();
+        SetFiringState(true);
+    }
 }

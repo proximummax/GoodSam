@@ -7,15 +7,15 @@ public class AIAgent : MonoBehaviour
     [SerializeField] private AIAgentConfig _config;
     public AIAgentConfig Config { get { return _config; } }
     public AIStateMachine StateMachine { get; private set; }
-
     public NavMeshAgent NavMeshAgent { get; private set; }
-
     public AIAnimationController AnimationController { get; private set; }
     public Ragdoll Ragdoll { get; private set; }
     public AIHealthBar HealthBar { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public ThirdPlayerController MainPlayer { get; private set; }
     public AIWeaponOwner WeaponOwner { get; private set; }
+    public AISensor AISensor { get; private set; }
+    public LevelBounds LevelBounds { get; private set; }  
     private void Start()
     {
         StateMachine = new AIStateMachine(this);
@@ -31,7 +31,8 @@ public class AIAgent : MonoBehaviour
         AnimationController = GetComponent<AIAnimationController>();
         NavMeshAgent = GetComponent<NavMeshAgent>();
         WeaponOwner = GetComponent<AIWeaponOwner>();
-
+        AISensor = GetComponent<AISensor>();
+        LevelBounds = FindObjectOfType<LevelBounds>();
         MainPlayer = FindObjectOfType<ThirdPlayerController>();
 
       

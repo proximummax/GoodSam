@@ -1,12 +1,14 @@
 using Cinemachine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 
-public class BaseWeaponOwnerComponent : MonoBehaviour
+public abstract class BaseWeaponOwnerComponent : MonoBehaviour
 {
     public enum EWeaponSlot
     {
@@ -181,9 +183,13 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
         StartCoroutine(SwitchWeapon(_currentWeaponIndex, (EWeaponSlot)weaponIndex));
 
         weapon.OnClipEmpty += OnEmptyClip;
-
+        weapon.OnAmmoChanged += OnAmmoChanged;
+        weapon.OnReloaded += OnReloadExit;
         weapon.Init(_aimingComponent, _rigAnimator);
+
     }
+
+    
 
     protected virtual IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
     {
@@ -292,5 +298,9 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
             ResetWeapon();
         }
     }
+    protected abstract void OnAmmoChanged(int ammo);
+    protected virtual void OnReloadExit()
+    {
 
+    }
 }

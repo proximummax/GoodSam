@@ -8,6 +8,7 @@ public abstract class BaseWeapon : MonoBehaviour
     [HideInInspector]
     public UnityAction<BaseWeapon> OnClipEmpty;
     public UnityAction<int> OnAmmoChanged;
+    public UnityAction OnReloaded;
 
     [Header("Weapon")]
     [HideInInspector] public BaseRecoil Recoil;
@@ -173,6 +174,7 @@ public abstract class BaseWeapon : MonoBehaviour
         _currentAmmo.Bullets = DefaultAmmo.Bullets;
 
         OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
+        OnReloaded?.Invoke();
     }
     public bool CanReload()
     {
