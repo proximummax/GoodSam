@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class GunWeapon : BaseWeapon
 {
-    protected override void MakeShot()
+    protected override void MakeShot(Vector3 target)
     {
         throw new System.NotImplementedException();
     }
-
-   
 }

@@ -22,7 +22,6 @@ public class AIFindWeaponState : AIState
 
     public void Update(AIAgent agent)
     {
-        Debug.Log("call upd");
         if (agent.NavMeshAgent.hasPath)
             agent.AnimationController.SetSpeed(agent.NavMeshAgent.velocity.magnitude);
         else
@@ -30,7 +29,6 @@ public class AIFindWeaponState : AIState
 
         if (agent.WeaponOwner.GetActiveWeapon())
         {
-            Debug.Log("has weapon");
             agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
         }
     }

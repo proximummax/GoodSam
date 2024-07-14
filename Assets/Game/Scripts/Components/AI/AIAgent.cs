@@ -31,25 +31,20 @@ public class AIAgent : MonoBehaviour
         AnimationController = GetComponent<AIAnimationController>();
         NavMeshAgent = GetComponent<NavMeshAgent>();
         WeaponOwner = GetComponent<AIWeaponOwner>();
+
         MainPlayer = FindObjectOfType<ThirdPlayerController>();
-        HealthComponent.Died += OnDied;
+
+      
 
         StateMachine.ChangeState(_initialState);
 
     }
-    private void OnDisable()
-    {
-        HealthComponent.Died -= OnDied;
-    }
+
 
 
     private void Update()
     {
         StateMachine.Update();
     }
-    private void OnDied()
-    {
-        StateMachine.ChangeState(AIStateID.Death);
-        NavMeshAgent.enabled = false;
-    }
+
 }

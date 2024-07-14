@@ -14,7 +14,7 @@ public abstract class BaseWeapon : MonoBehaviour
     protected CrosshairTarget _crosshairTarget;
     [SerializeField] protected BaseWeaponOwnerComponent.EWeaponSlot _weaponSlot;
     [SerializeField] private Transform _muzzleSocket;
-    public Transform MuzzleSocket { get => _muzzleSocket;}
+    public Transform MuzzleSocket { get => _muzzleSocket; }
 
     [SerializeField] protected WeaponData WeaponData;
     [SerializeField] protected AmmoData DefaultAmmo;
@@ -112,27 +112,34 @@ public abstract class BaseWeapon : MonoBehaviour
 
         }
     }
-    public void UpdateFiring(float deltaTIme)
+    public void UpdateFiring(float deltaTime, Vector3 target)
     {
-        _accumulatedTime += deltaTIme;
+        _accumulatedTime += deltaTime;
         float fireInterval = 1.0f / FireRate;
         while (_accumulatedTime >= 0.0f)
         {
-            MakeShot();
+            MakeShot(target);
             _accumulatedTime -= fireInterval;
         }
     }
-    public void Init(CrosshairTarget crosshairTarget, AimingComponent _aimingComponent, Animator _rigController)
+    public void Init(AimingComponent _aimingComponent, Animator _rigController)
     {
         if (DefaultAmmo.Bullets <= 0)
             Debug.Log("BUllets count couldn`t be less of equal zero");
         if (DefaultAmmo.Clips <= 0)
             Debug.Log("Clips count couldn`t be less of equal zero");
 
-        Recoil._rigController = _rigController;
-        if (_aimingComponent)
-            Recoil.AimingComponent = _aimingComponent;
-        _crosshairTarget = crosshairTarget;
+        if (Recoil)
+        {
+            Recoil._rigController = _rigController;
+            if (_aimingComponent)
+            {
+                Recoil.AimingComponent = _aimingComponent;
+            }
+        }
+
+
+
         _currentAmmo = ScriptableObject.CreateInstance<AmmoData>();
         _currentAmmo.Init(DefaultAmmo);
 
@@ -144,7 +151,8 @@ public abstract class BaseWeapon : MonoBehaviour
     }
     protected void Reset()
     {
-        Recoil.Reset();
+        if (Recoil)
+            Recoil.Reset();
     }
     public virtual void StartFire()
     {
@@ -155,7 +163,6 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         IsFiring = false;
     }
-
 
     public void ChangeClip()
     {
@@ -225,8 +232,8 @@ public abstract class BaseWeapon : MonoBehaviour
         return true;
     }
 
-    protected abstract void MakeShot();
-    virtual protected bool GetTraceData(ref Vector3 traceStart, ref Vector3 direction)
+    protected abstract void MakeShot(Vector3 target);
+    virtual protected bool GetTraceData(ref Vector3 traceStart, ref Vector3 direction, Vector3 target)
     {
         Vector3 viewLocation = new Vector3();
         Quaternion viewRotation = new Quaternion();

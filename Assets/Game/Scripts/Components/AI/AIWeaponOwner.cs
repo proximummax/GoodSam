@@ -5,7 +5,8 @@ using UnityEngine;
 public class AIWeaponOwner : BaseWeaponOwnerComponent
 {
     private WeaponIK _weaponIK;
-
+    private bool _active = false;
+    [SerializeField] private float _inaccuracy;
     protected override void Start()
     {
         base.Start();
@@ -15,24 +16,40 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     {
         base.EquipWeapon(weapon);
     }
+    protected override void Update()
+    {
+        if (_weaponIK.GetTarget() && GetActiveWeapon() && _active)
+        {
+            Vector3 target = _weaponIK.GetTarget().EnemyTarget.position;
+            target += Random.insideUnitSphere * _inaccuracy;
+            if (GetActiveWeapon().IsFiring)
+                GetActiveWeapon().UpdateFiring(Time.deltaTime, target);
+
+            GetActiveWeapon().UpdateBullets(Time.deltaTime);
+            // GetActiveWeapon().UpdateFiring
+        }
+    }
+    public void SetFiringState(bool enabled)
+    {
+        if (enabled)
+        {
+            GetActiveWeapon().StartFire();
+        }
+        else
+        {
+            GetActiveWeapon().StopFire();
+        }
+    }
     public void SetTarget(Transform target)
     {
         _weaponIK.SetTargetTransform(target);
     }
     public IEnumerator ActivateWeapon()
     {
+
         yield return new WaitForSeconds(0.5f);
         _weaponIK.SetAimTransform(GetActiveWeapon().MuzzleSocket);
+        _active = true;
     }
-    public void DropWeapon()
-    {
-        var activeWeapon = GetActiveWeapon();
-        if (activeWeapon)
-        {
-            activeWeapon.transform.SetParent(null);
-            activeWeapon.gameObject.GetComponent<BoxCollider>().enabled = true;
-            activeWeapon.gameObject.AddComponent<Rigidbody>();
-            ResetWeapon();
-        }
-    }
+    
 }

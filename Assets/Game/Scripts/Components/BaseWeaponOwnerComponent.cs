@@ -34,7 +34,7 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
     private bool _isHolstered = false;
     public bool IsChangingWeapon { get; private set; } = false;
 
-   
+
     protected virtual void Start()
     {
 
@@ -44,18 +44,20 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
     }
     protected virtual void Update()
     {
+
         var weapon = GetWeapon(_currentWeaponIndex);
         bool notSprinting = _rigAnimator.GetCurrentAnimatorStateInfo(2).shortNameHash == Animator.StringToHash("notSprinting");
         if (weapon && !_isHolstered && notSprinting)
         {
             if (weapon.IsFiring)
-                weapon.UpdateFiring(Time.deltaTime);
+                weapon.UpdateFiring(Time.deltaTime, _crosshairTarget.transform.position);
 
             weapon.UpdateBullets(Time.deltaTime);
         }
 
 
     }
+
     public BaseWeapon GetWeapon(int index)
     {
         if (index < 0 || index >= _equipedWeapons.Length)
@@ -71,13 +73,13 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
         _currentWeaponIndex = -1;
     }
 
-    public void StartFire(InputAction.CallbackContext context)
+    public void StartFire(InputAction.CallbackContext context = default)
     {
         if (!CanFire()) return;
         GetWeapon(_currentWeaponIndex).StartFire();
     }
 
-    public void StopFire(InputAction.CallbackContext context)
+    public void StopFire(InputAction.CallbackContext context = default)
     {
         if (!GetWeapon(_currentWeaponIndex)) return;
         GetWeapon(_currentWeaponIndex).StopFire();
@@ -107,7 +109,8 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
     }
     public void Reload(InputAction.CallbackContext context = default)
     {
-        _reloadComponent.SetReloadTrigger();
+        if (_reloadComponent)
+            _reloadComponent.SetReloadTrigger();
         ChangeClip();
     }
     public bool GetWeaponUIData(out WeaponUIData uiData)
@@ -178,8 +181,8 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
         StartCoroutine(SwitchWeapon(_currentWeaponIndex, (EWeaponSlot)weaponIndex));
 
         weapon.OnClipEmpty += OnEmptyClip;
-     
-        weapon.Init(_crosshairTarget, _aimingComponent, _rigAnimator);
+
+        weapon.Init(_aimingComponent, _rigAnimator);
     }
 
     protected virtual IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
@@ -192,8 +195,8 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
         yield return StartCoroutine(ActivateWeapon((int)activeSlot));
         _currentWeaponIndex = (int)activeSlot;
 
-      //  if (GetActiveWeapon())
-     //       OnAmmoChanged(GetActiveWeapon().GetAmmoData().Bullets);
+        //  if (GetActiveWeapon())
+        //       OnAmmoChanged(GetActiveWeapon().GetAmmoData().Bullets);
     }
     protected IEnumerator HolsterWeapon(int weaponIndex)
     {
@@ -278,5 +281,16 @@ public class BaseWeaponOwnerComponent : MonoBehaviour
         GetWeapon(_currentWeaponIndex).StopFire();
         GetWeapon(_currentWeaponIndex).ChangeClip();
     }
-   
+    public void DropWeapon()
+    {
+        var activeWeapon = GetActiveWeapon();
+        if (activeWeapon)
+        {
+            activeWeapon.transform.SetParent(null);
+            activeWeapon.gameObject.GetComponent<BoxCollider>().enabled = true;
+            activeWeapon.gameObject.AddComponent<Rigidbody>();
+            ResetWeapon();
+        }
+    }
+
 }

@@ -42,14 +42,16 @@ public class WeaponIK : MonoBehaviour
         if (_aim != null && _target != null)
         {
             
-            Debug.Log("has aim and target!");
          //   for (int i = 0; i < _bonesTransforms.Length; i++)
           //  {
            //     AimTarget(_bonesTransforms[i], GetTargetPosition(), _humanBones[i].Weight * _weight);
           //  }
         }
     }
-
+    public ThirdPlayerController GetTarget()
+    {
+        return _target?.GetComponent<ThirdPlayerController>();
+    }
     public void SetTargetTransform(Transform target)
     {
         _target = target;

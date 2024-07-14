@@ -16,6 +16,8 @@ public class ThirdPlayerController : MonoBehaviour
     [SerializeField] private float _jumpDamp;
     [SerializeField] private float _groundSpeed;
 
+    [SerializeField] private Transform _enemyTarget;
+    public Transform EnemyTarget { get { return _enemyTarget; } }
 
     private Vector3 _velocity;
     public bool IsJumping { get; private set; }

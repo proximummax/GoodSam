@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 
 public class BulletWeapon : BaseWeapon
@@ -8,12 +9,14 @@ public class BulletWeapon : BaseWeapon
 
     [SerializeField] private float _bulletSpread = 1.5f;
     [SerializeField] private float _damageAmount = 10.0f;
+
+    private Vector3 _target;
     public override void StartFire()
     {
         base.StartFire();
-        _muzzleFlashFX.Emit(1);
+       
 
-     //   MakeShot();
+        //   MakeShot();
     }
 
     public override void StopFire()
@@ -22,7 +25,7 @@ public class BulletWeapon : BaseWeapon
         Reset();
     }
 
-    protected override bool GetTraceData(ref Vector3 traceStart, ref Vector3 direction)
+    protected override bool GetTraceData(ref Vector3 traceStart, ref Vector3 direction, Vector3 target)
     {
         Vector3 viewLocation = new Vector3();
         Quaternion viewRotation = new Quaternion();
@@ -30,35 +33,38 @@ public class BulletWeapon : BaseWeapon
         GetPlayerViewPoint(ref viewLocation, ref viewRotation);
         traceStart = viewLocation;
 
-        direction = _crosshairTarget.transform.position - viewLocation;
-
+        direction = target - viewLocation;
         return true;
     }
-
-    protected override void MakeShot()
+  
+    protected override void MakeShot(Vector3 target)
     {
+        _target = target;
         if (IsAmmoEmpty())
         {
             StopFire();
-            Debug.Log("STOP");
             return;
         }
 
         Vector3 traceStart = new Vector3(), direction = new Vector3();
-        if (!GetTraceData(ref traceStart, ref direction))
+        if (!GetTraceData(ref traceStart, ref direction, target))
         {
             StopFire();
             return;
         }
+        
 
         DecreaseAmmo();
         Vector3 velocity = direction * BulletSpeed;
+
         var bullet = CreateBullet(traceStart, velocity);
         Bullets.Add(bullet);
 
+        _muzzleFlashFX.Emit(1);
 
-        Recoil.GenerateRecoil(GunAnimatorName);
-      
+        if (Recoil)
+            Recoil.GenerateRecoil(GunAnimatorName);
+
     }
 
 

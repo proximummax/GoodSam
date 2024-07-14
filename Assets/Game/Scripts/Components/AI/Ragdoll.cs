@@ -5,10 +5,10 @@ using UnityEngine;
 public class Ragdoll : MonoBehaviour
 {
     private Rigidbody[] _rigidbodies;
-    private AIAnimationController _animationComponent;
+    private BaseAnimationComponent _animationComponent;
     private void Start()
     {
-        _animationComponent = GetComponent<AIAnimationController>();
+        _animationComponent = GetComponent<BaseAnimationComponent>();
         _rigidbodies = GetComponentsInChildren<Rigidbody>();
         DeactivateRagdoll();
     }

@@ -1,16 +1,18 @@
+using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Events;
 
 public class HealthComponent : MonoBehaviour
 {
     [SerializeField] private AIHealthBar _healthBar;
-    [SerializeField] private float _initHealth;
-    private float _currentHealth;
+    [SerializeField] protected float _initHealth;
+    protected float _currentHealth;
 
 
     private HitEffect _hitEffect;
 
-    public UnityAction Died;
+
     private void Start()
     {
         SetSubscribeStateOnHitsEvents(true);
@@ -35,14 +37,23 @@ public class HealthComponent : MonoBehaviour
                     hitBox.OnHit -= TakeDamage;
             }
         }
+
+        OnStart();
     }
     public void TakeDamage(float amount)
     {
         if (_currentHealth <= 0)
             return;
-
+        Debug.Log("hit!");
         _currentHealth -= amount;
-        _healthBar.SetPercentage(_currentHealth / _initHealth);
+        if (_healthBar)
+        {
+            _healthBar.SetPercentage(_currentHealth / _initHealth);
+        }
+        
+
+        OnDamage();
+
         if (_currentHealth <= 0.0f)
         {
             Die();
@@ -51,6 +62,24 @@ public class HealthComponent : MonoBehaviour
     }
     private void Die()
     {
-        Died?.Invoke();
+        OnDeath();
     }
+    public bool IsDead()
+    {
+        return _currentHealth <= 0.0f;
+    }
+
+    protected virtual void OnStart()
+    {
+
+    }
+    protected virtual void OnDeath()
+    {
+
+    }
+    protected virtual void OnDamage()
+    {
+
+    }
+
 }
