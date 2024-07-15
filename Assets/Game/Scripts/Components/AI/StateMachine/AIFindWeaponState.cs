@@ -29,7 +29,6 @@ public class AIFindWeaponState : AIState
             _pickup = FindPickup(agent);
             if (_pickup)
             {
-                Debug.Log("find");
                 CollectPickup(agent, _pickup);
             }
         }

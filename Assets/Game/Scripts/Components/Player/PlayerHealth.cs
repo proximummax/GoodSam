@@ -28,8 +28,17 @@ public class PlayerHealth : HealthComponent
 
     protected override void OnDamage()
     {
+       UpdateVignette();
+    }
+ 
+    protected override void OnHeal(float amount)
+    {
+        UpdateVignette();
+    }
+    private void UpdateVignette()
+    {
         Vignette vignette;
-       
+
         if (_volume.profile.TryGet(out vignette))
         {
             float percent = 1.0f - (_currentHealth / _initHealth);

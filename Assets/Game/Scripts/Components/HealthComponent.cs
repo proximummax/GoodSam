@@ -1,7 +1,6 @@
-using UnityEditorInternal;
+
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Events;
+
 
 public class HealthComponent : MonoBehaviour
 {
@@ -69,6 +68,15 @@ public class HealthComponent : MonoBehaviour
         return _currentHealth <= 0.0f;
     }
 
+    public void Heal(float amount)
+    {
+        _currentHealth = Mathf.Min(_initHealth, _currentHealth + amount);
+        if (_healthBar)
+        {
+            _healthBar.SetPercentage(_currentHealth / _initHealth);
+        }
+        OnHeal(amount);
+    }
     protected virtual void OnStart()
     {
 
@@ -80,6 +88,8 @@ public class HealthComponent : MonoBehaviour
     protected virtual void OnDamage()
     {
 
+    }
+    protected virtual void OnHeal(float amount) {
     }
 
 }

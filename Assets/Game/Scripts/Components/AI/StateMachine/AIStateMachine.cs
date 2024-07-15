@@ -8,7 +8,7 @@ public class AIStateMachine
     private AIState[] _states;
     private AIAgent _agent;
     private AIStateID _currentState;
-
+    public AIStateID CurrentState {  get { return _currentState; } }
     public AIStateMachine(AIAgent agent)
     {
         _agent = agent;

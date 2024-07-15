@@ -82,6 +82,7 @@ public class AISensor : MonoBehaviour
         dest.y = origin.y;
         if (Physics.Linecast(origin, dest, _occlusionLayers))
             return false;
+
         return true;
     }
 

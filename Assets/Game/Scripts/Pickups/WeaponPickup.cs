@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class WeaponPickup : MonoBehaviour
+public class WeaponPickup : BasePickup
 {
     [SerializeField] private BaseWeapon _weaponPrefab;
     private void OnTriggerEnter(Collider other)

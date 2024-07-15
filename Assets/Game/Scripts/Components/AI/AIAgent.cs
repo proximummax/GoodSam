@@ -15,7 +15,9 @@ public class AIAgent : MonoBehaviour
     public ThirdPlayerController MainPlayer { get; private set; }
     public AIWeaponOwner WeaponOwner { get; private set; }
     public AISensor AISensor { get; private set; }
-    public LevelBounds LevelBounds { get; private set; }  
+    public LevelBounds LevelBounds { get; private set; }
+
+    public AIStateID CurrentState;
     private void Start()
     {
         StateMachine = new AIStateMachine(this);
@@ -46,6 +48,7 @@ public class AIAgent : MonoBehaviour
     private void Update()
     {
         StateMachine.Update();
+        CurrentState = StateMachine.CurrentState;
     }
 
 }

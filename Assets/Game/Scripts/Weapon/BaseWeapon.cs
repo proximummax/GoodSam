@@ -98,10 +98,12 @@ public abstract class BaseWeapon : MonoBehaviour
                 hitBox.ApplyHit(10);
 
             }
-            HitEffect.transform.position = hitResult.point;
-            HitEffect.transform.forward = hitResult.normal;
-            HitEffect.Emit(1);
-
+            else
+            {
+                HitEffect.transform.position = hitResult.point;
+                HitEffect.transform.forward = hitResult.normal;
+                HitEffect.Emit(1);
+            }
             if (bullet.Tracer)
                 bullet.Tracer.transform.position = hitResult.point;
             bullet.Time = MaxLifeTime;
@@ -119,6 +121,7 @@ public abstract class BaseWeapon : MonoBehaviour
         float fireInterval = 1.0f / FireRate;
         while (_accumulatedTime >= 0.0f)
         {
+            Debug.Log("make shoot");
             MakeShot(target);
             _accumulatedTime -= fireInterval;
         }
@@ -157,11 +160,16 @@ public abstract class BaseWeapon : MonoBehaviour
     }
     public virtual void StartFire()
     {
+        if (IsFiring)
+            return;
+
         IsFiring = true;
         _accumulatedTime = 0.0f;
     }
     public virtual void StopFire()
     {
+        if (!IsFiring)
+            return;
         IsFiring = false;
     }
 
