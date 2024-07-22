@@ -22,6 +22,7 @@ public class WeaponIK : MonoBehaviour
     [SerializeField] private float _distanceLimit = 1.5f;
 
     private AIAnimationController _animationController;
+    private AIWeaponOwner _weaponOwner;
     private Transform _target = null;
     private Transform _aim = null;
 
@@ -30,6 +31,7 @@ public class WeaponIK : MonoBehaviour
     private void Start()
     {
         _animationController = GetComponent<AIAnimationController>();
+        _weaponOwner = GetComponent<AIWeaponOwner>();
 
         _bonesTransforms = new Transform[_humanBones.Length];
         for (int i = 0; i < _bonesTransforms.Length; i++)
@@ -41,11 +43,11 @@ public class WeaponIK : MonoBehaviour
     {
         if (_aim != null && _target != null)
         {
-            
-         //   for (int i = 0; i < _bonesTransforms.Length; i++)
-          //  {
-           //     AimTarget(_bonesTransforms[i], GetTargetPosition(), _humanBones[i].Weight * _weight);
-          //  }
+
+            //   for (int i = 0; i < _bonesTransforms.Length; i++)
+            //  {
+            //     AimTarget(_bonesTransforms[i], GetTargetPosition(), _humanBones[i].Weight * _weight);
+            //  }
         }
     }
     public ThirdPlayerController GetTarget()
@@ -55,15 +57,20 @@ public class WeaponIK : MonoBehaviour
     public void SetTargetTransform(Transform target)
     {
         _target = target;
-        foreach (var aimingElement in _aimingElements)
+
+        if (_target == null)
         {
-            Debug.Log(aimingElement.name + " " + aimingElement.data.sourceObjects[0].transform.name);
-            Debug.Log(aimingElement.data.sourceObjects.GetWeight(0));
-            aimingElement.data.sourceObjects.SetWeight(0, 1.0f);
-            _rigBuilder.Build();
-            Debug.Log(aimingElement.data.sourceObjects.GetWeight(0));
+            Debug.Log("null");
+            _animationController.RigAnimator.Play("reset_target", 0);
         }
-       
+        else
+        {
+            Debug.Log("not null");
+            _animationController.RigAnimator.Play("equip_" + _weaponOwner.GetActiveWeapon().GunAnimatorName);
+   //         _animationController.RigAnimator.SetInteger("weapon_index", (int)_weaponOwner.GetActiveWeapon().WeaponSlot);
+        }
+
+
     }
     public void SetAimTransform(Transform aim)
     {

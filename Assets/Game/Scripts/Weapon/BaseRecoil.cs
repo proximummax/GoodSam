@@ -3,33 +3,23 @@ using UnityEngine;
 
 public class BaseRecoil : MonoBehaviour
 {
-    [HideInInspector] public AimingComponent AimingComponent;
-    [HideInInspector] public Animator _rigController;
-    private CinemachineImpulseSource _cameraShake;
-
+    public float RecoilModifier { get; set; } = 1.0f;
 
     [SerializeField] private Vector2[] _recoilPattern;
-
     [SerializeField] private float _duration;
-    public float RecoilModifier = 1.0f;
 
+    private AimingComponent _aimingComponent;
+    private Animator _rigController;
+    private CinemachineImpulseSource _cameraShake;
 
     private float _elapsedTime;
     private int _currentPatternPart;
-
     private Vector2 _currentRecoil;
 
-    private void Awake()
+    public void Inititalize(AimingComponent aimingComponent, Animator rigController)
     {
-        _cameraShake = GetComponent<CinemachineImpulseSource>();
-    }
-    public void Reset()
-    {
-        _currentPatternPart = 0;
-    }
-    private int NextPattern(int current)
-    {
-        return (current + 1) % _recoilPattern.Length;
+        _aimingComponent = aimingComponent;
+        _rigController = rigController;
     }
     public void GenerateRecoil(string weaponName)
     {
@@ -39,16 +29,30 @@ public class BaseRecoil : MonoBehaviour
         if (_recoilPattern.Length > 0)
         {
             _currentRecoil = _recoilPattern[_currentPatternPart];
-            _currentPatternPart = NextPattern(_currentPatternPart);
+            _currentPatternPart = GetNextPattern(_currentPatternPart);
         }
+
         _rigController.Play("weapon_recoil_" + weaponName, 1, 0.0f);
     }
+    public void Reset()
+    {
+        _currentPatternPart = 0;
+    }
+    private void Awake()
+    {
+        _cameraShake = GetComponent<CinemachineImpulseSource>();
+    }
+    private int GetNextPattern(int current)
+    {
+        return (current + 1) % _recoilPattern.Length;
+    }
+
     private void Update()
     {
         if (_elapsedTime > 0 && _recoilPattern.Length > 0)
         {
-            AimingComponent.YAxis.Value -= ((_currentRecoil.y * Time.deltaTime) / _duration) * RecoilModifier;
-            AimingComponent.XAxis.Value -= ((_currentRecoil.x * Time.deltaTime) / _duration) * RecoilModifier;
+            _aimingComponent.YAxis.Value -= ((_currentRecoil.y * Time.deltaTime) / _duration) * RecoilModifier;
+            _aimingComponent.XAxis.Value -= ((_currentRecoil.x * Time.deltaTime) / _duration) * RecoilModifier;
             _elapsedTime -= Time.deltaTime;
         }
     }

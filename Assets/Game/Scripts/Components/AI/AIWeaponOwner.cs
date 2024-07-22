@@ -15,6 +15,8 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     public override void EquipWeapon(BaseWeapon weapon)
     {
         base.EquipWeapon(weapon);
+        weapon.SetRecoil(null);
+        weapon.Init(_aimingComponent, _rigAnimator);
     }
     
     protected override void Update()
@@ -43,6 +45,7 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     }
     public void SetTarget(Transform target)
     {
+        Debug.Log("set");
         _weaponIK.SetTargetTransform(target);
     }
     public IEnumerator ActivateWeapon()
@@ -54,7 +57,7 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     }
 
     
-    protected override void OnAmmoChanged(int ammo)
+    protected override void OnAmmoChanged(int ammo, int clips)
     {
        
     }

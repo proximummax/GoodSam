@@ -1,23 +1,23 @@
 using UnityEngine;
 
-public class AIFindWeaponState : AIState
+public class AIFindHealthState : AIState
 {
-
     private GameObject _pickup;
     private GameObject[] _pickups = new GameObject[1];
     public AIStateID GetID()
     {
-        return AIStateID.FindWeapon;
+        return AIStateID.FindHealth;
     }
     public void Enter(AIAgent agent)
     {
+        Debug.Log("enter pickup health");
         _pickup = null;
-        agent.NavMeshAgent.speed = 5.0f;
+        agent.NavMeshAgent.speed = 6.0f;
     }
 
     public void Exit(AIAgent agent)
     {
-        
+
     }
 
     public void Update(AIAgent agent)
@@ -46,15 +46,15 @@ public class AIFindWeaponState : AIState
             agent.AnimationController.SetSpeed(0);
 
 
-        if (agent.WeaponOwner.GetActiveWeapon())
+        if (!agent.HealthComponent.IsLowHealth())
         {
             agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
         }
     }
     private GameObject FindPickup(AIAgent agent)
     {
-        int count = agent.AISensor.Filter(_pickups, "Pickup", "Weapon");
-        if(count > 0)
+        int count = agent.AISensor.Filter(_pickups, "Pickup", "Health");
+        if (count > 0)
         {
             return _pickups[0];
         }

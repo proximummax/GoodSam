@@ -28,7 +28,7 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
 
 
     [SerializeField] protected Animator _rigAnimator;
-    [SerializeField] private AimingComponent _aimingComponent;
+    [SerializeField] protected AimingComponent _aimingComponent;
 
     private BaseWeapon[] _equipedWeapons = new BaseWeapon[2];
     protected int _currentWeaponIndex = 0;
@@ -135,28 +135,11 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
         return true;
     }
 
-    /*    public bool TryToAddAmmo(BaseWeapon weaponType, int clipsAmount)
-        {
-            foreach (var weapon in _weapons)
-            {
-                if (!weapon || weapon.GetType() != weaponType.GetType())
-                    continue;
+    public void TryToAddAmmo(int clipsAmount)
+    {
+        GetActiveWeapon().TryToAddAmmo(clipsAmount);
+    }
 
-                return weapon.TryToAddAmmo(clipsAmount);
-            }
-            return false;
-        }
-        public bool NeedAmmo(BaseWeapon weaponType)
-        {
-            foreach (var weapon in _weapons)
-            {
-                if (!weapon || weapon.GetType() != weaponType.GetType())//  !weapon->IsA(WeaponType))
-                    continue;
-
-                return weapon.IsAmmoFull();
-            }
-            return false;
-        }*/
     protected bool CanFire()
     {
         return GetWeapon(_currentWeaponIndex) && !_isHolstered;//&& !_reloadAnimInProgress;
@@ -185,11 +168,12 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
         weapon.OnClipEmpty += OnEmptyClip;
         weapon.OnAmmoChanged += OnAmmoChanged;
         weapon.OnReloaded += OnReloadExit;
-        weapon.Init(_aimingComponent, _rigAnimator);
+
+       
 
     }
 
-    
+
 
     protected virtual IEnumerator SwitchWeapon(int holsterIndex, EWeaponSlot activeSlot)
     {
@@ -298,7 +282,7 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
             ResetWeapon();
         }
     }
-    protected abstract void OnAmmoChanged(int ammo);
+    protected abstract void OnAmmoChanged(int ammo, int clips);
     protected virtual void OnReloadExit()
     {
 

@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AIHealth : HealthComponent
 {
     private AIAgent _agent;
+    [SerializeField] private int lowHealth = 20;
     protected override void OnStart()
     {
         _agent = GetComponent<AIAgent>();
@@ -17,5 +16,9 @@ public class AIHealth : HealthComponent
     protected override void OnDamage()
     {
 
+    }
+    public bool IsLowHealth()
+    {
+        return _currentHealth <= lowHealth;
     }
 }

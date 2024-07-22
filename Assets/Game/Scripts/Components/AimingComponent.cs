@@ -27,7 +27,7 @@ public class AimingComponent : MonoBehaviour
     {
         _animationComponent.SetAimingState(IsAiming);
         var weapon = _weaponOwner.GetActiveWeapon();
-        if (weapon)
+        if (weapon && weapon.Recoil)
         {
             weapon.Recoil.RecoilModifier = IsAiming ? 0.3f : 1.0f;
         }

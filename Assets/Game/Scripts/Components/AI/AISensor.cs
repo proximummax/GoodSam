@@ -1,8 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
+
 
 [ExecuteInEditMode]
 public class AISensor : MonoBehaviour
@@ -188,12 +186,16 @@ public class AISensor : MonoBehaviour
         }
     }
 
-    public int Filter(GameObject[] buffer, string layerName)
+    public int Filter(GameObject[] buffer, string layerName, string tagName = null)
     {
         int layer = LayerMask.NameToLayer(layerName);
         int count = 0;
         foreach (var obj in Objects)
         {
+            if (tagName != null && !obj.CompareTag(tagName))
+            {
+                continue;
+            }
             if (obj.layer == layer)
             {
                 buffer[count++] = obj;

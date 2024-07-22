@@ -5,6 +5,8 @@ public class BaseAnimationComponent : MonoBehaviour
 {
 
     public Animator Animator { get; private set; }
+    [SerializeField] private Animator _rigAnimator;
+    public Animator RigAnimator { get => _rigAnimator; }
     protected virtual void Awake()
     {
         Animator = GetComponent<Animator>();

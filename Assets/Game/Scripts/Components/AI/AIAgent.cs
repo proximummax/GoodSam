@@ -11,7 +11,7 @@ public class AIAgent : MonoBehaviour
     public AIAnimationController AnimationController { get; private set; }
     public Ragdoll Ragdoll { get; private set; }
     public AIHealthBar HealthBar { get; private set; }
-    public HealthComponent HealthComponent { get; private set; }
+    public AIHealth HealthComponent { get; private set; }
     public ThirdPlayerController MainPlayer { get; private set; }
     public AIWeaponOwner WeaponOwner { get; private set; }
     public AISensor AISensor { get; private set; }
@@ -26,10 +26,12 @@ public class AIAgent : MonoBehaviour
         StateMachine.RegisterState(new AIIdleState());
         StateMachine.RegisterState(new AIFindWeaponState());
         StateMachine.RegisterState(new AIAttackState());
+        StateMachine.RegisterState(new AIFindHealthState());
+        StateMachine.RegisterState(new AIFindAmmoState());
 
         HealthBar = GetComponentInChildren<AIHealthBar>();
         Ragdoll = GetComponent<Ragdoll>();
-        HealthComponent = GetComponent<HealthComponent>();
+        HealthComponent = GetComponent<AIHealth>();
         AnimationController = GetComponent<AIAnimationController>();
         NavMeshAgent = GetComponent<NavMeshAgent>();
         WeaponOwner = GetComponent<AIWeaponOwner>();

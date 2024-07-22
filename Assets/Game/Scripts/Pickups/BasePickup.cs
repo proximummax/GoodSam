@@ -8,4 +8,9 @@ public class BasePickup : MonoBehaviour
     }
     [SerializeField] private EPickupType _type;
     public EPickupType Type { get { return _type; } }
+
+    private void Awake()
+    {
+      //  tag = Type.ToString();
+    }
 }

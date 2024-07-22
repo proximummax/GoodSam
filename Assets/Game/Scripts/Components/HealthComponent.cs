@@ -43,7 +43,7 @@ public class HealthComponent : MonoBehaviour
     {
         if (_currentHealth <= 0)
             return;
-        Debug.Log("hit!");
+
         _currentHealth -= amount;
         if (_healthBar)
         {

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AIAttackState : AIState
@@ -19,15 +17,27 @@ public class AIAttackState : AIState
     public void Exit(AIAgent agent)
     {
         agent.NavMeshAgent.stoppingDistance = 0.0f;
+        agent.WeaponOwner.SetFiringState(false);
+        agent.WeaponOwner.SetTarget(null);
     }
 
     public void Update(AIAgent agent)
     {
         agent.NavMeshAgent.destination = agent.MainPlayer.transform.position;
         UpdateFiring(agent);
+
         if (agent.MainPlayer.GetComponent<HealthComponent>().IsDead())
         {
             agent.StateMachine.ChangeState(AIStateID.Idle);
+        }
+
+        if (agent.HealthComponent.IsLowHealth())
+        {
+            agent.StateMachine.ChangeState(AIStateID.FindHealth);
+        }
+        if (agent.WeaponOwner.GetActiveWeapon() != null && agent.WeaponOwner.GetActiveWeapon().IsAmmoEmpty())
+        {
+            agent.StateMachine.ChangeState(AIStateID.FindAmmo);
         }
     }
     private void UpdateFiring(AIAgent agent)

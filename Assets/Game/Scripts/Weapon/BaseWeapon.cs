@@ -7,7 +7,7 @@ public abstract class BaseWeapon : MonoBehaviour
 {
     [HideInInspector]
     public UnityAction<BaseWeapon> OnClipEmpty;
-    public UnityAction<int> OnAmmoChanged;
+    public UnityAction<int,int> OnAmmoChanged;
     public UnityAction OnReloaded;
 
     [Header("Weapon")]
@@ -52,6 +52,10 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         enabled = false;
         Recoil = GetComponent<BaseRecoil>();
+    }
+    public void SetRecoil(BaseRecoil recoil)
+    {
+        Recoil = recoil;
     }
     protected virtual BaseBullet CreateBullet(Vector3 position, Vector3 velocity)
     {
@@ -121,7 +125,6 @@ public abstract class BaseWeapon : MonoBehaviour
         float fireInterval = 1.0f / FireRate;
         while (_accumulatedTime >= 0.0f)
         {
-            Debug.Log("make shoot");
             MakeShot(target);
             _accumulatedTime -= fireInterval;
         }
@@ -130,16 +133,12 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         if (DefaultAmmo.Bullets <= 0)
             Debug.Log("BUllets count couldn`t be less of equal zero");
-        if (DefaultAmmo.Clips <= 0)
+        if (DefaultAmmo.Clips <= 0 && !DefaultAmmo.Infinite)
             Debug.Log("Clips count couldn`t be less of equal zero");
 
         if (Recoil)
         {
-            Recoil._rigController = _rigController;
-            if (_aimingComponent)
-            {
-                Recoil.AimingComponent = _aimingComponent;
-            }
+            Recoil.Inititalize(_aimingComponent, _rigController);
         }
 
 
@@ -147,7 +146,7 @@ public abstract class BaseWeapon : MonoBehaviour
         _currentAmmo = ScriptableObject.CreateInstance<AmmoData>();
         _currentAmmo.Init(DefaultAmmo);
 
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
     }
     public WeaponData GetData()
     {
@@ -162,7 +161,7 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         if (IsFiring)
             return;
-
+        Debug.Log("we can fire");
         IsFiring = true;
         _accumulatedTime = 0.0f;
     }
@@ -181,7 +180,7 @@ public abstract class BaseWeapon : MonoBehaviour
         _currentAmmo.Clips--;
         _currentAmmo.Bullets = DefaultAmmo.Bullets;
 
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
         OnReloaded?.Invoke();
     }
     public bool CanReload()
@@ -238,6 +237,7 @@ public abstract class BaseWeapon : MonoBehaviour
 
             _currentAmmo.Bullets = DefaultAmmo.Bullets;
         }
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
 
         return true;
     }
@@ -275,7 +275,7 @@ public abstract class BaseWeapon : MonoBehaviour
         _currentAmmo.Bullets--;
 
 
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
 
         if (IsClipEmpty() && !IsAmmoEmpty())
         {

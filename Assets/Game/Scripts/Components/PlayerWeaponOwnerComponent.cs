@@ -21,10 +21,12 @@ public class PlayerWeaponOwnerComponent : BaseWeaponOwnerComponent
     public override void EquipWeapon(BaseWeapon weapon)
     {
         base.EquipWeapon(weapon);
+        weapon.SetRecoil(weapon.GetComponent<BaseRecoil>());
+        weapon.Init(_aimingComponent, _rigAnimator);
     }
 
-    protected override void OnAmmoChanged(int ammo)
+    protected override void OnAmmoChanged(int ammo, int clips)
     {
-        _widgetsHolder.AmmoWidget.Refresh(ammo);
+        _widgetsHolder.AmmoWidget.Refresh(ammo, clips);
     }
 }
