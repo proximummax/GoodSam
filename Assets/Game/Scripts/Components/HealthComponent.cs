@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.Events;
 
 
 public class HealthComponent : MonoBehaviour
@@ -11,6 +12,7 @@ public class HealthComponent : MonoBehaviour
 
     private HitEffect _hitEffect;
 
+    public UnityAction OnDied;
 
     private void Start()
     {

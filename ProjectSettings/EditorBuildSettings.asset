@@ -6,7 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Game/Scenes/SampleScene.unity
+    path: Assets/Game/Scenes/Menu.unity
+    guid: 5cbce9cc82184cf489ee96a5311ef3c3
+  - enabled: 1
+    path: Assets/DownloadedAssets/PolygonCyberCity/Scenes/Arena.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
     path: Assets/DownloadedAssets/PolygonCyberCity/Scenes/Demo_City.unity

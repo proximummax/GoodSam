@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : HealthComponent
 {
@@ -24,6 +25,9 @@ public class PlayerHealth : HealthComponent
         _weaponOwner.DropWeapon();
         _aiming.enabled = false;
         _cameraManager.EnableKillCamera();
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        //   OnDied?.Invoke();
     }
 
     protected override void OnDamage()

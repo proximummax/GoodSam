@@ -78,8 +78,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f058b2be8fdbba488c1d146e3bfe0b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AimingComponent: {fileID: 0}
-  _rigController: {fileID: 0}
   _recoilPattern:
   - {x: 1, y: 1}
   - {x: 0.7, y: 1}
@@ -96,7 +94,6 @@ MonoBehaviour:
   - {x: 0.2, y: 1}
   - {x: 0.5, y: 1}
   _duration: 0.1
-  RecoilModifier: 1
 --- !u!114 &-6007549259985245898
 MonoBehaviour:
   m_ObjectHideFlags: 0

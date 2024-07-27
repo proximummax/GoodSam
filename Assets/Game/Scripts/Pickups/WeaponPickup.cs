@@ -11,9 +11,12 @@ public class WeaponPickup : BasePickup
             weaponOwner.EquipWeapon(weapon);
             Destroy(gameObject);
         }
-        
+
         if (other.TryGetComponent(out AIWeaponOwner aiWeaponOwner))
         {
+            if (aiWeaponOwner.GetActiveWeapon() != null)
+                return;
+
             BaseWeapon weapon = Instantiate(_weaponPrefab);
             aiWeaponOwner.EquipWeapon(weapon);
             Destroy(gameObject);

@@ -33,11 +33,11 @@ public class AIAttackState : AIState
 
         if (agent.HealthComponent.IsLowHealth())
         {
-            agent.StateMachine.ChangeState(AIStateID.FindHealth);
+          //  agent.StateMachine.ChangeState(AIStateID.FindHealth);
         }
         if (agent.WeaponOwner.GetActiveWeapon() != null && agent.WeaponOwner.GetActiveWeapon().IsAmmoEmpty())
         {
-            agent.StateMachine.ChangeState(AIStateID.FindAmmo);
+        //    agent.StateMachine.ChangeState(AIStateID.FindAmmo);
         }
     }
     private void UpdateFiring(AIAgent agent)

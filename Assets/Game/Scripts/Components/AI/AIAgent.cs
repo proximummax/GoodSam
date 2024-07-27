@@ -18,7 +18,9 @@ public class AIAgent : MonoBehaviour
     public LevelBounds LevelBounds { get; private set; }
 
     public AIStateID CurrentState;
-    private void Start()
+    
+
+    public void Initialize()
     {
         StateMachine = new AIStateMachine(this);
         StateMachine.RegisterState(new AIChasePlayerState());
@@ -39,12 +41,10 @@ public class AIAgent : MonoBehaviour
         LevelBounds = FindObjectOfType<LevelBounds>();
         MainPlayer = FindObjectOfType<ThirdPlayerController>();
 
-      
+
 
         StateMachine.ChangeState(_initialState);
-
     }
-
 
 
     private void Update()

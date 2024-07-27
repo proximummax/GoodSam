@@ -12,6 +12,7 @@ public class AIHealth : HealthComponent
     {
         _agent.StateMachine.ChangeState(AIStateID.Death);
         _agent.NavMeshAgent.enabled = false;
+        OnDied?.Invoke();
     }
     protected override void OnDamage()
     {
