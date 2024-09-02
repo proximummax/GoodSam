@@ -24,10 +24,12 @@ public class ThirdPlayerController : MonoBehaviour
     public bool IsSprinting { get; private set; } = false;
 
     public CharacterController CharacterController { get { return _characterController; } }
-    public Vector2 Input { get; private set; }
+    public Vector2 Input { get; private set; } = Vector2.zero;
     public bool IsAiming { get; private set; }
 
     private Vector3 _rootMotion;
+
+    Coroutine lerpCoroutine;
     private void Awake()
     {
         _playerInput = new PlayerInput();
@@ -52,13 +54,14 @@ public class ThirdPlayerController : MonoBehaviour
         _playerInput.Player.Reload.performed += _weaponOwner.Reload;
 
         _playerInput.Player.Jump.performed += Jump;
-        //    _playerInput.Player.Jump.canceled += Jump;
+
 
         _playerInput.Player.Sprint.performed += delegate { IsSprinting = true; };
         _playerInput.Player.Sprint.canceled += delegate { IsSprinting = false; };
 
         _playerInput.Player.Zoom.started += delegate { _aimingComponent.OnAimingStateChanged(true); };
         _playerInput.Player.Zoom.canceled += delegate { _aimingComponent.OnAimingStateChanged(false); };
+
     }
 
     private void OnDisable()
@@ -67,14 +70,20 @@ public class ThirdPlayerController : MonoBehaviour
     }
     private void Update()
     {
-        Input = _playerInput.Player.Move.ReadValue<Vector2>();
+
+        if (Input != _playerInput.Player.Move.ReadValue<Vector2>())
+        {
+            Input = new Vector2(Mathf.Lerp(Input.x, _playerInput.Player.Move.ReadValue<Vector2>().x, 5f * Time.deltaTime),
+                Mathf.Lerp(Input.y, _playerInput.Player.Move.ReadValue<Vector2>().y, 5f * Time.deltaTime));
+        }
+
         IsAiming = _playerInput.Player.Zoom.phase == InputActionPhase.Performed;
         UpdateIsSprinting();
     }
-  
+
     private void OnAnimatorMove()
     {
-        _rootMotion += _animationComponent.Animator.deltaPosition;
+        _rootMotion += _animationComponent.MeshAnimator.deltaPosition;
     }
     private void FixedUpdate()
     {
@@ -89,7 +98,7 @@ public class ThirdPlayerController : MonoBehaviour
     }
     private bool IsSpringing()
     {
-        return IsSprinting && (_weaponOwner.GetActiveWeapon() == null ||  
+        return IsSprinting && (_weaponOwner.GetActiveWeapon() == null ||
             (_weaponOwner.GetActiveWeapon() != null &&
             !_weaponOwner.GetActiveWeapon().IsFiring &&
             !_weaponOwner.ReloadComponent.IsReloading &&
@@ -111,7 +120,7 @@ public class ThirdPlayerController : MonoBehaviour
         if (!CharacterController.isGrounded)
         {
             SetInAir(0);
-          
+
         }
     }
 
@@ -139,12 +148,12 @@ public class ThirdPlayerController : MonoBehaviour
     private void SetInAir(float jumpVelocity)
     {
         IsJumping = true;
-        _velocity = _animationComponent.Animator.velocity * _jumpDamp * _groundSpeed;
+        _velocity = _animationComponent.MeshAnimator.velocity * _jumpDamp * _groundSpeed;
         _velocity.y = jumpVelocity;
         _animationComponent.SetJumpingState(true);
     }
     private Vector3 CalculateAirControl()
     {
-        return ((transform.forward * Input.y) + (transform.right * Input.x)) * (_airControl/100);
+        return ((transform.forward * Input.y) + (transform.right * Input.x)) * (_airControl / 100);
     }
 }

@@ -1,33 +1,37 @@
 
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
 
 public class HealthComponent : MonoBehaviour
 {
-    [SerializeField] private AIHealthBar _healthBar;
+    [SerializeField] private Transform _meshRoot;
+    [SerializeField] protected BaseHealthBar _healthBar;
     [SerializeField] protected float _initHealth;
     protected float _currentHealth;
 
 
-    private HitEffect _hitEffect;
+   [SerializeField] private HitEffect _hitEffect;
 
-    public UnityAction OnDied;
+    public UnityEvent OnDied;
 
     private void Start()
     {
         SetSubscribeStateOnHitsEvents(true);
-
-        _hitEffect = GetComponent<HitEffect>();
         _currentHealth = _initHealth;
     }
     private void OnDisable()
     {
         SetSubscribeStateOnHitsEvents(false);
     }
+    public void SetHealth(float health)
+    {
+        _initHealth = health;
+    }
     private void SetSubscribeStateOnHitsEvents(bool state)
     {
-        var rigidbodies = GetComponentsInChildren<Rigidbody>();
+        var rigidbodies = _meshRoot.GetComponentsInChildren<Rigidbody>();
         foreach (var rigidbody in rigidbodies)
         {
             if (rigidbody.gameObject.TryGetComponent(out HitBox hitBox))
@@ -51,10 +55,8 @@ public class HealthComponent : MonoBehaviour
         {
             _healthBar.SetPercentage(_currentHealth / _initHealth);
         }
-        
 
         OnDamage();
-
         if (_currentHealth <= 0.0f)
         {
             Die();

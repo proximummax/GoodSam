@@ -1,27 +1,22 @@
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 
 public class BulletWeapon : BaseWeapon
 {
-
     [SerializeField] private ParticleSystem _muzzleFlashFX;
-
     [SerializeField] private float _bulletSpread = 1.5f;
-    [SerializeField] private float _damageAmount = 10.0f;
+
 
     private Vector3 _target;
     public override void StartFire()
     {
         base.StartFire();
-       
-
-        //   MakeShot();
     }
 
     public override void StopFire()
     {
         base.StopFire();
+        //  _fireSource.Stop();
         Reset();
     }
 
@@ -36,7 +31,7 @@ public class BulletWeapon : BaseWeapon
         direction = target - viewLocation;
         return true;
     }
-  
+
     protected override void MakeShot(Vector3 target)
     {
         _target = target;
@@ -52,7 +47,9 @@ public class BulletWeapon : BaseWeapon
             StopFire();
             return;
         }
-        
+
+        if (MusicManager.MusicVolume > 0.0f)
+            _source.PlayOneShot(_fireClip);
 
         DecreaseAmmo();
         Vector3 velocity = direction * BulletSpeed;

@@ -12,29 +12,28 @@ public class PlayerAnimationComponent : BaseAnimationComponent
 
     [SerializeField] private Animator _rigController;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
         _thirdPlayerController = GetComponent<ThirdPlayerController>();
     }
    
     public void SetJumpingState(bool state)
     {
-        Animator.SetBool(IS_JUMPING, state);
+        MeshAnimator.SetBool(IS_JUMPING, state);
     }
     public void SetAimingState(bool state)
     {
-        Animator.SetBool(IS_AIMING, state);
+        MeshAnimator.SetBool(IS_AIMING, state);
     }
     public void SetSprintState(bool state)
     {
-        Animator.SetBool(IS_SPRINTING, state);
+        MeshAnimator.SetBool(IS_SPRINTING, state);
         _rigController.SetBool(IS_SPRINTING, state);
     }
     private void Update()
     {
-        Animator.SetFloat(INPUT_X, _thirdPlayerController.Input.x);
-        Animator.SetFloat(INPUT_Y, _thirdPlayerController.Input.y);
+        MeshAnimator.SetFloat(INPUT_X, _thirdPlayerController.Input.x);
+        MeshAnimator.SetFloat(INPUT_Y, _thirdPlayerController.Input.y);
     }
 
   

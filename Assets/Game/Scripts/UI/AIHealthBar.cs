@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AIHealthBar : MonoBehaviour
+public class AIHealthBar : BaseHealthBar
 {
     [SerializeField] private Transform _target;
     [SerializeField] private Vector3 _offset;
@@ -18,7 +18,7 @@ public class AIHealthBar : MonoBehaviour
 
         transform.position = Camera.main.WorldToScreenPoint(_target.position + _offset);
     }
-    public void SetPercentage(float percentage)
+    public override void SetPercentage(float percentage)
     {
         float parentWidth = GetComponent<RectTransform>().rect.width;
         float width = parentWidth * percentage;

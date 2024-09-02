@@ -51,8 +51,8 @@ public class BaseRecoil : MonoBehaviour
     {
         if (_elapsedTime > 0 && _recoilPattern.Length > 0)
         {
-            _aimingComponent.YAxis.Value -= ((_currentRecoil.y * Time.deltaTime) / _duration) * RecoilModifier;
-            _aimingComponent.XAxis.Value -= ((_currentRecoil.x * Time.deltaTime) / _duration) * RecoilModifier;
+            _aimingComponent.YAxis.Value -= ((_currentRecoil.y*0.5f * Time.deltaTime) / _duration) * RecoilModifier;
+            _aimingComponent.XAxis.Value -= ((_currentRecoil.x * 0.5f * Time.deltaTime) / _duration) * RecoilModifier;
             _elapsedTime -= Time.deltaTime;
         }
     }

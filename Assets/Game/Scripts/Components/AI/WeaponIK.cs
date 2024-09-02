@@ -21,7 +21,8 @@ public class WeaponIK : MonoBehaviour
     [SerializeField] private float _angleLimit = 90.0f;
     [SerializeField] private float _distanceLimit = 1.5f;
 
-    private AIAnimationController _animationController;
+    [SerializeField] private AIAnimationController _animationController;
+    //private AIAnimationController _animationController;
     private AIWeaponOwner _weaponOwner;
     private Transform _target = null;
     private Transform _aim = null;
@@ -30,13 +31,13 @@ public class WeaponIK : MonoBehaviour
     [SerializeField] private RigBuilder _rigBuilder;
     private void Start()
     {
-        _animationController = GetComponent<AIAnimationController>();
+      //  _animationController = GetComponent<AIAnimationController>();
         _weaponOwner = GetComponent<AIWeaponOwner>();
 
         _bonesTransforms = new Transform[_humanBones.Length];
         for (int i = 0; i < _bonesTransforms.Length; i++)
         {
-            _bonesTransforms[i] = _animationController.Animator.GetBoneTransform(_humanBones[i].Bone);
+            _bonesTransforms[i] = _animationController.MeshAnimator.GetBoneTransform(_humanBones[i].Bone);
         }
     }
     private void LateUpdate()
@@ -60,13 +61,11 @@ public class WeaponIK : MonoBehaviour
 
         if (_target == null)
         {
-            Debug.Log("null");
-            _animationController.RigAnimator.Play("reset_target", 0);
+          //  _animationController.RigAnimator.Play("reset_target", 0);
         }
         else
         {
-            Debug.Log("not null");
-            _animationController.RigAnimator.Play("equip_" + _weaponOwner.GetActiveWeapon().GunAnimatorName);
+         //   _animationController.RigAnimator.Play("equip_" + _weaponOwner.GetActiveWeapon().GunAnimatorName);
    //         _animationController.RigAnimator.SetInteger("weapon_index", (int)_weaponOwner.GetActiveWeapon().WeaponSlot);
         }
 

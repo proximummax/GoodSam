@@ -70,17 +70,14 @@ public class AISensor : MonoBehaviour
 
         if (direction.y < 0 || direction.y > _height)
             return false;
-
         direction.y = 0;
         float deltaAngle = Vector3.Angle(direction, transform.forward);
         if (deltaAngle > _angle)
             return false;
-
         origin.y += _height / 2;
         dest.y = origin.y;
-        if (Physics.Linecast(origin, dest, _occlusionLayers))
-            return false;
-
+      //  if (Physics.Linecast(origin, dest, _occlusionLayers))
+       //     return false;
         return true;
     }
 

@@ -1,11 +1,7 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class AIChasePlayerState : AIState
 {
-
-
-
     private float _timer = 0.0f;
 
     public AIStateID GetID()
@@ -14,46 +10,31 @@ public class AIChasePlayerState : AIState
     }
     public void Enter(AIAgent agent)
     {
-
+        _timer = 0.0f;
+        agent.NavMeshAgent.destination = agent.TargetEnemy.transform.position;
+        agent.NavMeshAgent.speed = 4.0f;
+        agent.NavMeshAgent.stoppingDistance = 6.5f;
     }
 
     public void Exit(AIAgent agent)
     {
-
+        _timer = 0.0f;
+        agent.NavMeshAgent.stoppingDistance = 0.0f;
     }
-
-
 
     public void Update(AIAgent agent)
     {
         if (!agent.enabled)
             return;
-
-        _timer -= Time.deltaTime;
-
-        if (!agent.NavMeshAgent.hasPath)
+        _timer += Time.deltaTime;
+        agent.NavMeshAgent.destination = agent.TargetEnemy.transform.position;
+        if (_timer > 2.0f)
         {
-            agent.NavMeshAgent.destination = agent.MainPlayer.transform.position;
-        }
-        if (_timer < 0.0f)
-        {
-            Vector3 direction = (agent.MainPlayer.transform.position - agent.NavMeshAgent.destination);
-            direction.y = 0.0f;
-            if (direction.sqrMagnitude > Mathf.Pow(agent.Config.MaxDistance, 2))
+            if (agent.NavMeshAgent.remainingDistance != float.PositiveInfinity && agent.NavMeshAgent.remainingDistance <= agent.NavMeshAgent.stoppingDistance)
             {
-                if (agent.NavMeshAgent.pathStatus != NavMeshPathStatus.PathPartial)
-                {
-                    agent.NavMeshAgent.destination = agent.MainPlayer.transform.position;
-                }
+                agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
             }
-            _timer = agent.Config.MaxTime;
         }
-
-      //  if (agent.NavMeshAgent.hasPath)
-        //    agent.AnimationController.SetSpeed(agent.NavMeshAgent.velocity.magnitude);
-      //  else
-       //     agent.AnimationController.SetSpeed(0);
-
     }
 
 }

@@ -1,4 +1,3 @@
-using Cinemachine;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,7 +6,7 @@ public abstract class BaseWeapon : MonoBehaviour
 {
     [HideInInspector]
     public UnityAction<BaseWeapon> OnClipEmpty;
-    public UnityAction<int,int> OnAmmoChanged;
+    public UnityAction<int> OnAmmoChanged;
     public UnityAction OnReloaded;
 
     [Header("Weapon")]
@@ -17,13 +16,8 @@ public abstract class BaseWeapon : MonoBehaviour
     [SerializeField] private Transform _muzzleSocket;
     public Transform MuzzleSocket { get => _muzzleSocket; }
 
-    [SerializeField] protected WeaponData WeaponData;
     [SerializeField] protected AmmoData DefaultAmmo;
     [SerializeField] protected float TraceMaxDistance;
-
-
-    [Header("UI")]
-    [SerializeField] protected WeaponUIData UIData;
 
     [Header("Animation")]
     [SerializeField] string _gunAnimatorName;
@@ -36,6 +30,7 @@ public abstract class BaseWeapon : MonoBehaviour
     [SerializeField] protected float BulletSpeed = 1000;
     [SerializeField] protected float BulletDrop = 0.0f;
     [SerializeField] protected float MaxLifeTime = 3.0f;
+    [SerializeField] protected float DamageAmount = 10.0f;
 
     protected List<BaseBullet> Bullets = new List<BaseBullet>();
     float _accumulatedTime = 0.0f;
@@ -43,6 +38,11 @@ public abstract class BaseWeapon : MonoBehaviour
     [Header("FX")]
     [SerializeField] protected TrailRenderer TraceFX;
     [SerializeField] protected ParticleSystem HitEffect;
+
+    [Header("Sounds")]
+    [SerializeField] protected AudioSource _source;
+    [SerializeField] protected AudioClip _fireClip;
+    [SerializeField] protected AudioClip _reloadClip;
 
 
 
@@ -52,6 +52,10 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         enabled = false;
         Recoil = GetComponent<BaseRecoil>();
+    }
+    public void SetFireRate(float rate)
+    {
+        FireRate = rate;
     }
     public void SetRecoil(BaseRecoil recoil)
     {
@@ -99,7 +103,7 @@ public abstract class BaseWeapon : MonoBehaviour
         {
             if (hitResult.collider.TryGetComponent(out HitBox hitBox))
             {
-                hitBox.ApplyHit(10);
+                hitBox.ApplyHit(DamageAmount);
 
             }
             else
@@ -133,25 +137,18 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         if (DefaultAmmo.Bullets <= 0)
             Debug.Log("BUllets count couldn`t be less of equal zero");
-        if (DefaultAmmo.Clips <= 0 && !DefaultAmmo.Infinite)
-            Debug.Log("Clips count couldn`t be less of equal zero");
 
         if (Recoil)
         {
             Recoil.Inititalize(_aimingComponent, _rigController);
         }
 
-
-
         _currentAmmo = ScriptableObject.CreateInstance<AmmoData>();
         _currentAmmo.Init(DefaultAmmo);
 
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
     }
-    public WeaponData GetData()
-    {
-        return WeaponData;
-    }
+
     protected void Reset()
     {
         if (Recoil)
@@ -161,9 +158,8 @@ public abstract class BaseWeapon : MonoBehaviour
     {
         if (IsFiring)
             return;
-        Debug.Log("we can fire");
         IsFiring = true;
-        _accumulatedTime = 0.0f;
+      //  _accumulatedTime = 0.0f;
     }
     public virtual void StopFire()
     {
@@ -174,62 +170,42 @@ public abstract class BaseWeapon : MonoBehaviour
 
     public void ChangeClip()
     {
-        if (_currentAmmo.Infinite) return;
-        if (_currentAmmo.Clips == 0) return;
-
-        _currentAmmo.Clips--;
         _currentAmmo.Bullets = DefaultAmmo.Bullets;
 
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
         OnReloaded?.Invoke();
+
+        if (MusicManager.MusicVolume > 0.0f)
+            _source.PlayOneShot(_reloadClip);
     }
     public bool CanReload()
     {
-        return _currentAmmo.Bullets < DefaultAmmo.Bullets && _currentAmmo.Clips > 0;
+        return _currentAmmo.Bullets < DefaultAmmo.Bullets;
     }
     public bool IsAmmoEmpty()
     {
-        return !_currentAmmo.Infinite && _currentAmmo.Clips == 0 && IsClipEmpty();
+        return IsClipEmpty();
     }
     public bool IsAmmoFull()
     {
-        return _currentAmmo.Clips == DefaultAmmo.Clips && _currentAmmo.Bullets == DefaultAmmo.Bullets;
+        return _currentAmmo.Bullets == DefaultAmmo.Bullets;
     }
     protected bool IsClipEmpty()
     {
         return _currentAmmo.Bullets == 0;
     }
-
-    public WeaponUIData GetUIData() { return UIData; }
     public AmmoData GetAmmoData() { return _currentAmmo; }
 
     public bool TryToAddAmmo(int clipsAmount)
     {
-        if (IsAmmoFull() || _currentAmmo.Infinite || clipsAmount <= 0)
+        if (IsAmmoFull() || clipsAmount <= 0)
             return false;
 
         if (IsAmmoEmpty())
         {
             Debug.Log("Ammo was empty");
 
-            _currentAmmo.Clips = Mathf.Clamp(_currentAmmo.Clips + clipsAmount, 0, DefaultAmmo.Clips + 1);
             OnClipEmpty?.Invoke(this);
-        }
-        else if (_currentAmmo.Clips < DefaultAmmo.Clips)
-        {
-            var nextClipsAmount = _currentAmmo.Clips + clipsAmount;
-            if (DefaultAmmo.Clips - nextClipsAmount >= 0)
-            {
-                Debug.Log("Clips were added");
-                _currentAmmo.Clips = nextClipsAmount;
-            }
-            else
-            {
-                Debug.Log("Ammo is full now");
-
-                _currentAmmo.Clips = DefaultAmmo.Clips;
-                _currentAmmo.Bullets = DefaultAmmo.Bullets;
-            }
         }
         else
         {
@@ -237,7 +213,7 @@ public abstract class BaseWeapon : MonoBehaviour
 
             _currentAmmo.Bullets = DefaultAmmo.Bullets;
         }
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
 
         return true;
     }
@@ -271,13 +247,11 @@ public abstract class BaseWeapon : MonoBehaviour
     protected void DecreaseAmmo()
     {
         if (_currentAmmo.Bullets == 0) return;
-
         _currentAmmo.Bullets--;
 
+        OnAmmoChanged?.Invoke(_currentAmmo.Bullets);
 
-        OnAmmoChanged?.Invoke(_currentAmmo.Bullets, _currentAmmo.Clips);
-
-        if (IsClipEmpty() && !IsAmmoEmpty())
+        if (IsClipEmpty())
         {
             StopFire();
             OnClipEmpty?.Invoke(this);

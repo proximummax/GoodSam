@@ -6,19 +6,24 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     private WeaponIK _weaponIK;
     private bool _active = false;
     [SerializeField] private float _inaccuracy;
+    [SerializeField] private BaseWeapon _weaponPrefab;
 
     protected override void Start()
     {
         base.Start();
         _weaponIK = GetComponent<WeaponIK>();
+
+        BaseWeapon weapon = Instantiate(_weaponPrefab);
+        EquipWeapon(weapon);
     }
     public override void EquipWeapon(BaseWeapon weapon)
     {
         base.EquipWeapon(weapon);
+        weapon.SetFireRate(1f);
         weapon.SetRecoil(null);
         weapon.Init(_aimingComponent, _rigAnimator);
     }
-    
+
     protected override void Update()
     {
         if (_weaponIK.GetTarget() && GetActiveWeapon() && _active)
@@ -45,21 +50,22 @@ public class AIWeaponOwner : BaseWeaponOwnerComponent
     }
     public void SetTarget(Transform target)
     {
-        Debug.Log("set");
-        _weaponIK.SetTargetTransform(target);
+        if (target)
+            _weaponIK.SetTargetTransform(target);
     }
     public IEnumerator ActivateWeapon()
     {
 
         yield return new WaitForSeconds(0.5f);
-        _weaponIK.SetAimTransform(GetActiveWeapon().MuzzleSocket);
+        if (_weaponIK != null && GetActiveWeapon() != null)
+            _weaponIK.SetAimTransform(GetActiveWeapon().MuzzleSocket);
         _active = true;
     }
 
-    
-    protected override void OnAmmoChanged(int ammo, int clips)
+
+    protected override void OnAmmoChanged(int ammo)
     {
-       
+
     }
     protected override void OnReloadExit()
     {

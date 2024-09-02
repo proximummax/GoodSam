@@ -26,7 +26,9 @@ public class PlayerHealth : HealthComponent
         _aiming.enabled = false;
         _cameraManager.EnableKillCamera();
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        OnDied?.Invoke();
+        //  SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         //   OnDied?.Invoke();
     }
 

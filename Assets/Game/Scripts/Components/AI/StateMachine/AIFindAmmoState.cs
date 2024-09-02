@@ -47,7 +47,8 @@ public class AIFindAmmoState : AIState
 
         if (agent.WeaponOwner.GetActiveWeapon() != null && !agent.WeaponOwner.GetActiveWeapon().IsAmmoEmpty())
         {
-            agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
+            agent.StateMachine.ChangeState(AIStateID.ChasePlayer);
+           // agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
         }
     }
     private GameObject FindPickup(AIAgent agent)

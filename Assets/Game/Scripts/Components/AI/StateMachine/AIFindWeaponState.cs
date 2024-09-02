@@ -11,13 +11,14 @@ public class AIFindWeaponState : AIState
     }
     public void Enter(AIAgent agent)
     {
+        Debug.Log("start find");
         _pickup = null;
-        agent.NavMeshAgent.speed = 5.0f;
+        agent.NavMeshAgent.speed = 6.0f;
     }
 
     public void Exit(AIAgent agent)
     {
-        
+        Debug.Log("end find");
     }
 
     public void Update(AIAgent agent)
@@ -48,7 +49,8 @@ public class AIFindWeaponState : AIState
 
         if (agent.WeaponOwner.GetActiveWeapon())
         {
-            agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
+            agent.StateMachine.ChangeState(AIStateID.ChasePlayer);
+            //  agent.StateMachine.ChangeState(AIStateID.AttackPlayer);
         }
     }
     private GameObject FindPickup(AIAgent agent)

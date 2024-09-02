@@ -5,6 +5,7 @@ public class WeaponPickup : BasePickup
     [SerializeField] private BaseWeapon _weaponPrefab;
     private void OnTriggerEnter(Collider other)
     {
+     //   print("enter?");
         if (other.TryGetComponent(out PlayerWeaponOwnerComponent weaponOwner))
         {
             BaseWeapon weapon = Instantiate(_weaponPrefab);
@@ -14,6 +15,7 @@ public class WeaponPickup : BasePickup
 
         if (other.TryGetComponent(out AIWeaponOwner aiWeaponOwner))
         {
+            print("enter?");
             if (aiWeaponOwner.GetActiveWeapon() != null)
                 return;
 

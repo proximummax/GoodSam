@@ -12,7 +12,6 @@ public class AIDeathState : AIState
     public void Enter(AIAgent agent)
     {
         agent.Ragdoll.ActivateRagdoll();
-        agent.HealthBar.gameObject.SetActive(false);
         agent.WeaponOwner.DropWeapon();
     }
 

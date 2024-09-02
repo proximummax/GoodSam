@@ -17,9 +17,9 @@ public class AIIdleState : AIState
     }
     public void Update(AIAgent agent)
     {
-        if (!agent.MainPlayer.GetComponent<HealthComponent>().IsDead())
+        if (!agent.TargetEnemy.GetComponent<HealthComponent>().IsDead())
         {
-            Vector3 playerDirection = agent.MainPlayer.transform.position - agent.transform.position;
+            Vector3 playerDirection = agent.TargetEnemy.transform.position - agent.transform.position;
 
             if (playerDirection.magnitude > agent.Config.MaxSightDistance)
                 return;

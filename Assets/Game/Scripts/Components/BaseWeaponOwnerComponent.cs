@@ -1,10 +1,6 @@
-using Cinemachine;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 
@@ -66,6 +62,10 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
             return null;
         return _equipedWeapons[index];
     }
+    public BaseWeapon[] GetWeapons()
+    {
+        return _equipedWeapons;
+    }
     public BaseWeapon GetActiveWeapon()
     {
         return GetWeapon(_currentWeaponIndex);
@@ -115,16 +115,6 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
             _reloadComponent.SetReloadTrigger();
         ChangeClip();
     }
-    public bool GetWeaponUIData(out WeaponUIData uiData)
-    {
-        uiData = null;
-
-        if (!GetWeapon(_currentWeaponIndex))
-            return false;
-
-        uiData = GetWeapon(_currentWeaponIndex).GetUIData();
-        return true;
-    }
     public bool GetAmmoData(out AmmoData ammoData)
     {
         ammoData = null;
@@ -150,7 +140,6 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
     }
     public virtual void EquipWeapon(BaseWeapon weapon)
     {
-        Debug.Log("call equip");
         if (weapon == null) return;
 
         if (GetWeapon(_currentWeaponIndex))
@@ -168,9 +157,6 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
         weapon.OnClipEmpty += OnEmptyClip;
         weapon.OnAmmoChanged += OnAmmoChanged;
         weapon.OnReloaded += OnReloadExit;
-
-       
-
     }
 
 
@@ -185,8 +171,8 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
         yield return StartCoroutine(ActivateWeapon((int)activeSlot));
         _currentWeaponIndex = (int)activeSlot;
 
-        //  if (GetActiveWeapon())
-        //       OnAmmoChanged(GetActiveWeapon().GetAmmoData().Bullets);
+        if (GetActiveWeapon())
+            OnAmmoChanged(GetActiveWeapon().GetAmmoData().Bullets);
     }
     protected IEnumerator HolsterWeapon(int weaponIndex)
     {
@@ -273,16 +259,27 @@ public abstract class BaseWeaponOwnerComponent : MonoBehaviour
     }
     public void DropWeapon()
     {
-        var activeWeapon = GetActiveWeapon();
-        if (activeWeapon)
+        foreach (var weapon in GetWeapons())
         {
-            activeWeapon.transform.SetParent(null);
-            activeWeapon.gameObject.GetComponent<BoxCollider>().enabled = true;
-            activeWeapon.gameObject.AddComponent<Rigidbody>();
-            ResetWeapon();
+            if (weapon != null)
+            {
+                weapon.transform.SetParent(null);
+                weapon.gameObject.GetComponent<BoxCollider>().enabled = true;
+                weapon.gameObject.AddComponent<Rigidbody>();
+                ResetWeapon();
+            }
+
         }
+        /*    var activeWeapon = GetActiveWeapon();
+            if (activeWeapon)
+            {
+                activeWeapon.transform.SetParent(null);
+                activeWeapon.gameObject.GetComponent<BoxCollider>().enabled = true;
+                activeWeapon.gameObject.AddComponent<Rigidbody>();
+                ResetWeapon();
+            }*/
     }
-    protected abstract void OnAmmoChanged(int ammo, int clips);
+    protected abstract void OnAmmoChanged(int ammo);
     protected virtual void OnReloadExit()
     {
 
