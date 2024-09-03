@@ -5,14 +5,14 @@ namespace YG.EditorScr.BuildModify
     {
         public static void LoadGameRun()
         {
-            if (infoYG.loadGameRun == false)
-            {
-                indexFile = indexFile.Replace("if (LocalHost()) // Delete when setting up: Load Game Run", "if (LocalHost())");
-            }
-            else
-            {
-                indexFile = indexFile.Replace("if (LocalHost()) // Delete when setting up: Load Game Run", "// Load Game Run = true");
-            }
+           // if (infoYG.loadGameRun == false)
+           // {
+           //     indexFile = indexFile.Replace("if (LocalHost()) // Delete when setting up: Load Game Run", "if (LocalHost())");
+          //  }
+           // else
+           // {
+             //   indexFile = indexFile.Replace("if (LocalHost()) // Delete when setting up: Load Game Run", "// Load Game Run = true");
+            //}
         }
     }
 }

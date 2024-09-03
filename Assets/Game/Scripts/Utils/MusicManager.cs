@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using YG;
 
 [RequireComponent(typeof(AudioSource))]
 public class MusicManager : MonoBehaviour
@@ -26,7 +27,25 @@ public class MusicManager : MonoBehaviour
         currentAudioSource = gameObject.GetComponent<AudioSource>();
         MusicVolume = PlayerPrefs.GetFloat("volume", 1.0f);
 
+        YandexGame.onVisibilityWindowGame += OnVisibilityWindowGame;
     }
+    private void OnDisable()
+    {
+        YandexGame.onVisibilityWindowGame -= OnVisibilityWindowGame;
+    }
+
+    void OnVisibilityWindowGame(bool visible)
+    {
+        if (visible)
+        {
+            MusicVolume = PlayerPrefs.GetFloat("volume", 1.0f);
+        }
+        else
+        {
+            MusicVolume = 0.0f;
+        }
+    }
+
     private void Update()
     {
         SetMusicVolume();
@@ -95,5 +114,5 @@ public class MusicManager : MonoBehaviour
         if (MusicVolume != currentAudioSource.volume && currentAudioSource.isPlaying)
             currentAudioSource.volume = MusicVolume;
     }
-  
+
 }

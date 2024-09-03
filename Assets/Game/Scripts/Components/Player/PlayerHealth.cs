@@ -28,8 +28,6 @@ public class PlayerHealth : HealthComponent
 
 
         OnDied?.Invoke();
-        //  SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        //   OnDied?.Invoke();
     }
 
     protected override void OnDamage()

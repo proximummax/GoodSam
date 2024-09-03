@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using YG;
 public class GameStateController : MonoBehaviour
 {
+    [SerializeField] private LoseWidget _loseWidget;
     [SerializeField] private PauseWidget _pauseWidget;
     [SerializeField] private SceneSwitcher _sceneSwitcher;
 
@@ -48,7 +48,7 @@ public class GameStateController : MonoBehaviour
         }
         else
         {
-            YandexGame.FullscreenShow();
+            _loseWidget.gameObject.SetActive(true);
         }
     }
     private IEnumerator CallWithDelay(float delay, Action<bool> action, bool value)
