@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using YG;
 
 public class LoseWidget : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class LoseWidget : MonoBehaviour
 
     private void OnEnable()
     {
-        Time.timeScale = 0.0f;
+        //Time.timeScale = 0.0f;
         Cursor.lockState = CursorLockMode.Confined;
     }
     private void OnDisable()
@@ -18,10 +19,15 @@ public class LoseWidget : MonoBehaviour
     }
     public void OnHomeButtonClick()
     {
-        YG.YandexGame.CloseFullAdEvent += delegate { SceneManager.LoadScene(0); };
+        YandexGame.Instance.CloseFullscreenAd.AddListener(delegate { SceneManager.LoadScene(0); });
+        //  YandexGame.CloseFullAdEvent += delegate { 
+        //     SceneManager.LoadScene(0);
+        // };
+        YandexGame.FullscreenShow();
     }
     public void OnRestartButtonClick()
     {
-        YG.YandexGame.CloseFullAdEvent += delegate { SceneManager.LoadScene(1); };
+        YandexGame.Instance.CloseFullscreenAd.AddListener(delegate { SceneManager.LoadScene(1); });
+        YandexGame.FullscreenShow();
     }
 }
