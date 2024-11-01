@@ -6,7 +6,7 @@ public class HealthPickup : BasePickup
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.TryGetComponent(out HealthComponent health))
+        if (other.TryGetComponent(out BaseHealthComponent health))
         {
             health.Heal(_amount);
             Destroy(gameObject);

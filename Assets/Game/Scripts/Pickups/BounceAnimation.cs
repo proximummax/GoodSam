@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BounceAnimation : MonoBehaviour
@@ -18,10 +16,8 @@ public class BounceAnimation : MonoBehaviour
     }
     private void Update()
     {
-
         UpdatePosition();
         UpdateRotation();
-
     }
     private void UpdatePosition()
     {

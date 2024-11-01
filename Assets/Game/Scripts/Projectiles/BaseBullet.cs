@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseBullet
@@ -11,7 +9,7 @@ public class BaseBullet
     public Vector3 GetPosition(Vector3 gravity)
     {
         // p + v*t + 0.5 * g * t * t
-        return (InitialPosition) + (InitialVelocity * Time) + (0.5f * gravity * Mathf.Pow(Time, 2));
+        return (InitialPosition) + (InitialVelocity * Time) + (gravity * (0.5f * Mathf.Pow(Time, 2)));
     }
    
 }
